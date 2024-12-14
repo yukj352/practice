@@ -27,7 +27,7 @@
             <a href="#"><i class="fab fa-instagram"></i></a>
         </div>
         <hr>
-        <p><strong>Made by:</strong><br>Yukta Choudhary<br>Durgesh Nandini Tekam<br>Vaishnavi Kanera</p>
+        <p><strong>Made by:</strong><br>Yukta Choudhary</p>
     </footer>
     <div id="newsModal" class="modal">
         <div class="modal-content">
