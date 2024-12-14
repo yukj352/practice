@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>News Arena</title>
+    <link rel="stylesheet" href="1.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+</head>
+<body>
+    <nav>
+        <div class="container">
+            <h1>News Arena</h1>
+        </div>
+    </nav>
+    <div class="search-container">
+        <input type="text" id="searchInput" placeholder="Search news...">
+        <button id="searchButton">Search</button>
+    </div>
+    <div class="spinner" id="spinner"></div>
+    <div class="grid" id="searchResults">
+        <!-- Your news cards will be populated here with JavaScript -->
+    </div>
+    <footer>
+        <p>News carries with it a powerful mythology, leading people to regard news as a mirror that is held up to society, a window on the world that tells <strong>"the way it is"</strong>. As a student, news should be an integral part of 24x7 life to stay updated with worldly activities of every genre.</p>
+        <div class="social-icons">
+            <a href="#"><i class="fab fa-facebook"></i></a>
+            <a href="#"><i class="fab fa-twitter"></i></a>
+            <a href="#"><i class="fab fa-instagram"></i></a>
+        </div>
+        <hr>
+        <p><strong>Made by:</strong><br>Yukta Choudhary<br>Durgesh Nandini Tekam<br>Vaishnavi Kanera</p>
+    </footer>
+    <div id="newsModal" class="modal">
+        <div class="modal-content">
+            <span class="close">&times;</span>
+            <h2 id="modalTitle"></h2>
+            <img id="modalImage" src="" alt="News Image">
+            <p id="modalDescription"></p>
+            <a id="modalLink" href="" target="_blank" class="btn btn-primary">Read more</a>
+        </div>
+    </div>
+    <script src="1.js"></script>
+</body>
+</html>
