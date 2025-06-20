@@ -1,0 +1,173 @@
+import 'package:flutter/material.dart';
+class calculator extends StatefulWidget {
+  const calculator({super.key});
+  @override
+  State<calculator> createState() => _calculatorState();
+}
+class _calculatorState extends State<calculator> {
+  String input = '' ;
+  TextEditingController res = TextEditingController();
+
+  void append(String value){
+    setState(() {
+      input+=value;
+      res.text=input;
+    });
+  }
+
+  void clear(){
+    setState(() {
+      input='';
+      res.text='';
+    });
+  }
+
+
+  void evaluate() {
+    try {
+      String finalInput = input.replaceAll('%', '/100');
+
+      // For security and simplicity, support only +, -, *, /, %
+      List<String> tokens = finalInput.split(RegExp(r'([+\-*/])')).map((e) => e.trim()).toList();
+      List<String> operators = RegExp(r'[+\-*/]').allMatches(finalInput).map((e) => e.group(0)!).toList();
+
+      double result = double.parse(tokens[0]);
+
+      for (int i = 0; i < operators.length; i++) {
+        double next = double.parse(tokens[i + 1]);
+
+        switch (operators[i]) {
+          case '+':
+            result += next;
+            break;
+          case '-':
+            result -= next;
+            break;
+          case '*':
+            result *= next;
+            break;
+          case '/':
+            result /= next;
+            break;
+        }
+      }
+
+      setState(() {
+        res.text = result.toString();
+        input = result.toString();
+      });
+    } catch (e) {
+      setState(() {
+        res.text = 'Error';
+      });
+    }
+  }
+
+
+
+
+  Widget NewContainer(){
+    return Center(
+      child: Container(
+        alignment: Alignment.center,
+        height: 100,
+        width:300 ,
+        decoration: BoxDecoration(
+          color: Color(0xFFFFF459),
+          borderRadius:BorderRadius.circular(16),
+        ),
+        // color: Color(0xFFFFF459),
+        child:  Padding(
+          padding: const EdgeInsets.fromLTRB(0.0,50, 0.0, 0.0),
+          child: TextFormField(controller:res),
+        ),
+      ),
+    );
+  }
+
+
+  Widget compo(String value, void Function() onTap) {
+    return GestureDetector(
+      onTap: onTap,
+      child: Container(
+        margin: EdgeInsets.all(4),
+        // color: Color(0xFF31081F),
+        alignment: Alignment.center,
+        decoration: BoxDecoration(
+          color: Color(0xFF31081F),
+          borderRadius: BorderRadius.circular(8),
+        ),
+        child: Text(
+          value,
+          style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold,color: Color(0xFFFFF7FE)),
+        ),
+      ),
+    );
+
+  }
+
+
+  @override
+  Widget build(BuildContext context) {
+
+    return Scaffold(
+      appBar: AppBar(title: Center(child: Text("Calculator")),),
+       body: Column(
+         children: [
+           NewContainer(),
+           SizedBox(
+             height: 600,
+             width: 300,
+             child: GridView(gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(crossAxisCount: 3),
+                     children: [
+                compo("1",()=> append("1")),
+                compo("2",()=> append("2")),
+                compo("=",evaluate),
+                compo("3",()=> append("3")),
+                compo("4",()=> append("4")),
+                compo("+",()=> append("+")),
+                compo("5",()=> append("5")),
+                compo("6",()=> append("6")),
+                compo("-",()=> append("-")),
+                compo("7",()=> append("7")),
+                compo("8",()=> append("8")),
+                compo("*",()=> append("*")),
+                compo("9",()=> append("9")),
+                compo("0",()=> append("0")),
+                       compo("/",()=> append("/")),
+                       compo("C",clear),
+                       compo("%",()=> append("%")),
+                       compo(".",()=> append("."))
+
+              ],
+             ),
+           )
+
+         ],
+
+       ),
+
+    );
+
+  }
+}
+
+Widget compo(String value, void Function() onTap) {
+  return GestureDetector(
+    onTap: onTap,
+    child: Container(
+      margin: EdgeInsets.all(4),
+      // color: Color(0xFF31081F),
+      alignment: Alignment.center,
+      decoration: BoxDecoration(
+        color: Color(0xFF31081F),
+        borderRadius: BorderRadius.circular(8),
+      ),
+      child: Text(
+        value,
+        style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold,color: Color(0xFFFFF7FE)),
+      ),
+    ),
+  );
+
+}
