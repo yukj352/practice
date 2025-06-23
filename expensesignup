@@ -1,0 +1,106 @@
+import 'package:flutter/material.dart';
+class SignupPage extends StatelessWidget {
+  const SignupPage({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+
+      backgroundColor: Color(0xFFFAEDE0),
+      appBar: AppBar(title: Text("SignUp",style: TextStyle(color: Color(0xFFFFFFFF)),),
+      backgroundColor: Color(0xFFB44FD1),
+      ),
+      body: Form(child: Center(
+        child: Padding(
+          padding: const EdgeInsets.all(32.0),
+          child: Column(
+            children: [
+              Padding(
+                padding: const EdgeInsets.symmetric(vertical: 10),
+                child: TextFormField(
+                  decoration: InputDecoration(
+                    labelText:"Name",
+                    hintText: 'Enter your Name',
+                    prefixIcon: Icon(Icons.person),
+                    border: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(12),
+                      borderSide: (BorderSide(
+                        color: Color(0xFF000000),
+                        width: 10,
+                        style: BorderStyle.solid
+                      )),
+                    ),
+
+                  ),
+                ),
+              ),
+              Padding(
+                padding: const EdgeInsets.symmetric(vertical: 10),
+                child: TextFormField(
+                  decoration: InputDecoration(
+                    labelText:"Email",
+                    hintText: 'Enter your Email',
+                    prefixIcon: Icon(Icons.email),
+                    border: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(12),
+                      borderSide: (BorderSide(
+                          color: Color(0xFF000000),
+                          width: 10,
+                          style: BorderStyle.solid
+                      )),
+                    ),
+
+                  ),
+                ),
+              ),
+              Padding(
+                padding: const EdgeInsets.symmetric(vertical: 10),
+                child: TextFormField(
+                  decoration: InputDecoration(
+                    labelText:"Password",
+                    hintText: 'Enter Password',
+                    prefixIcon: Icon(Icons.lock),
+                    border: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(12),
+                      borderSide: (BorderSide(
+                          color: Color(0xFF000000),
+                          width: 10,
+                          style: BorderStyle.solid
+                      )),
+                    ),
+
+                  ),
+                ),
+              ),
+              Padding(
+                padding: const EdgeInsets.fromLTRB(0, 30,0,10),
+                child: SizedBox(
+                  height:40,
+                  width: 200,
+                  child: ElevatedButton(onPressed: (){
+                  },
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: Color(0xFF133F86),
+                        foregroundColor: Color(0xFFFFFFFF)
+                      ),
+                      child: Text("Submit",style: TextStyle(fontSize: 16),)),
+                ),
+              ),
+              Padding(
+                padding: const EdgeInsets.symmetric(vertical: 5),
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    Text("Already a User?"),
+                    TextButton(onPressed: (){}, child: Text("Login"))
+                  ],
+                ),
+              )
+            ],
+          ),
+        ),
+
+      )),
+    );
+  }
+}
