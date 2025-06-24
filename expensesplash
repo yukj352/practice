@@ -1,56 +1,191 @@
-import 'package:final_cal/SignUpPage.dart';
 import 'package:flutter/material.dart';
-class ExpensetrackerSplashScreen extends StatefulWidget {
-  const ExpensetrackerSplashScreen({super.key});
+import 'SignUpPage.dart';
+
+class ExpenseTrackerSplashScreen extends StatefulWidget {
+  const ExpenseTrackerSplashScreen({super.key});
 
   @override
-  State<ExpensetrackerSplashScreen> createState() => _ExpensetrackerSplashScreenState();
+  State<ExpenseTrackerSplashScreen> createState() =>
+      _ExpenseTrackerSplashScreenState();
 }
 
-class _ExpensetrackerSplashScreenState extends State<ExpensetrackerSplashScreen> {
+class _ExpenseTrackerSplashScreenState extends State<ExpenseTrackerSplashScreen> {
+  double _opacity = 0.0;
+
   @override
-  void initState(){
+  void initState() {
     super.initState();
-    Future.delayed(Duration(seconds:2),(){
-      Navigator.pushReplacement(context, MaterialPageRoute(builder: (context)=>SignupPage()),);
+    Future.delayed(const Duration(milliseconds: 500), () {
+      setState(() {
+        _opacity = 1;
+      });
     });
-}
+    Future.delayed(const Duration(seconds: 3), () {
+      Navigator.pushReplacement(
+        context,
+        MaterialPageRoute(builder: (context) => const SignupPage()),
+      );
+    });
+  }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-          backgroundColor: Color(0xFFFAEDE0),
-          body: Center(
-            child: Column(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                   CircleAvatar(
-                      radius: 70,
-                  backgroundImage: AssetImage('assets/icon.png'),),
-
-                Padding(
-                  padding: const EdgeInsets.symmetric(vertical: 30),
-                  child: SizedBox(
-                    height: 100,
-                    child: Text("FinFlow",style: TextStyle(fontSize: 30,fontWeight: FontWeight.w700,color: Color(0xFFB44FD1)),
-                    ),
-                  ),
-                ),
-                Padding(
-                  padding: const EdgeInsets.symmetric(vertical: 40),
-                  child: CircularProgressIndicator(
-                    valueColor:AlwaysStoppedAnimation(Color(0xFFB44FD1)),
-                    strokeWidth: 5,
-
-                  ),
-                ),
-              ],
-            ),
+      body: Container(
+        decoration: const BoxDecoration(
+          gradient: LinearGradient(
+            colors: [Color(0xFF000000), Color(0xFF010080)],
+            begin: Alignment.topCenter,
+            end: Alignment.bottomCenter,
           ),
-
-      );
+        ),
+        child: Center(
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              const CircleAvatar(
+                radius: 70,
+                backgroundColor: Colors.transparent,
+                backgroundImage: AssetImage('mainlogo.png'),
+              ),
+              AnimatedOpacity(
+                opacity: _opacity,
+                duration: const Duration(seconds: 1),
+                child: Column(
+                  children: [
+                    const SizedBox(height: 30),
+                    const Text(
+                      "FinFlow",
+                      style: TextStyle(
+                        fontSize: 34,
+                        fontWeight: FontWeight.bold,
+                        color: Colors.white,
+                        letterSpacing: 1.2,
+                      ),
+                    ),
+                    const SizedBox(height: 10),
+                    Text(
+                      "Manage Your Money, Effortlessly",
+                      style: TextStyle(
+                        fontSize: 16,
+                        color: Colors.white.withOpacity(0.9),
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+              const SizedBox(height: 40),
+              const CircularProgressIndicator(
+                valueColor: AlwaysStoppedAnimation<Color>(Colors.white),
+                strokeWidth: 4,
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
   }
 }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+// import 'package:flutter/material.dart';
+// import 'SignUpPage.dart';
+// class ExpenseTrackerSplashScreen extends StatefulWidget {
+//   const ExpenseTrackerSplashScreen({super.key});
+//
+//   @override
+//   State<ExpenseTrackerSplashScreen> createState() => _ExpensetrackerSplashScreenState();
+// }
+//
+// class _ExpensetrackerSplashScreenState extends State<ExpenseTrackerSplashScreen> {
+//   @override
+//   double _opacity = 0.0;
+//
+//   void initState() {
+//     super.initState();
+//     Future.delayed(Duration(milliseconds: 500), () {
+//       setState(() {
+//         _opacity = 1;
+//       });
+//     });
+//     Future.delayed(Duration(seconds: 2), () {
+//       Navigator.pushReplacement(
+//         context, MaterialPageRoute(builder: (context) => SignupPage()),);
+//     });
+//   }
+//
+//   @override
+//   Widget build(BuildContext context) {
+//     return Scaffold(
+//       body: Container(
+//         decoration: BoxDecoration(
+//           gradient: LinearGradient(
+//             colors: [Color(0xFF7F3387), Color(0xFFFFFFFF)],
+//             begin: Alignment.topCenter,
+//             end: Alignment.bottomCenter,
+//           ),
+//         ),
+//         child: Center(
+//           child: Column(
+//             mainAxisAlignment: MainAxisAlignment.center,
+//             children: [
+//               CircleAvatar(
+//                 radius: 70,
+//                 backgroundColor: Colors.transparent, // Optional: avoids a white ring
+//                 backgroundImage: AssetImage('mainlogo.png'),
+//               ),
+//               Padding(
+//                 padding: const EdgeInsets.symmetric(vertical: 30),
+//                 child: Column(
+//                   children: [
+//                     Text(
+//                       "FinFlow",
+//                       style: TextStyle(
+//                         fontSize: 30,
+//                         fontWeight: FontWeight.w700,
+//                         color: Color(0xFFB44FD1),
+//                       ),
+//                     ),
+//                     Text(
+//                       "Manage Your Money, Effortlessly",
+//                       style: TextStyle(
+//                         fontSize: 16,
+//                         fontWeight: FontWeight.w400,
+//                         color: Colors.white,
+//                       ),
+//                     ),
+//                   ],
+//                 ),
+//               ),
+//               Padding(
+//                 padding: const EdgeInsets.symmetric(vertical: 40),
+//                 child: CircularProgressIndicator(
+//                   valueColor: AlwaysStoppedAnimation(Color(0xFFB44FD1)),
+//                   strokeWidth: 5,
+//                 ),
+//               ),
+//             ],
+//           ),
+//         ),
+//       ),
+//     );
+//   }
+// }
+
 
 
 
