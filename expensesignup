@@ -1,106 +1,218 @@
 import 'package:flutter/material.dart';
+
 class SignupPage extends StatelessWidget {
   const SignupPage({super.key});
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-
-      backgroundColor: Color(0xFFFAEDE0),
-      appBar: AppBar(title: Text("SignUp",style: TextStyle(color: Color(0xFFFFFFFF)),),
-      backgroundColor: Color(0xFFB44FD1),
+      appBar: AppBar(
+        title: const Text("Sign Up", style: TextStyle(color: Colors.white)),
+        backgroundColor: const Color(0xFF010080),
+        elevation: 0,
       ),
-      body: Form(child: Center(
-        child: Padding(
-          padding: const EdgeInsets.all(32.0),
-          child: Column(
-            children: [
-              Padding(
-                padding: const EdgeInsets.symmetric(vertical: 10),
-                child: TextFormField(
-                  decoration: InputDecoration(
-                    labelText:"Name",
-                    hintText: 'Enter your Name',
-                    prefixIcon: Icon(Icons.person),
-                    border: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(12),
-                      borderSide: (BorderSide(
-                        color: Color(0xFF000000),
-                        width: 10,
-                        style: BorderStyle.solid
-                      )),
-                    ),
+      body: Container(
+        decoration: const BoxDecoration(
+            gradient: LinearGradient(
+              colors: [
+                Color(0xFFD3E3FD),
+                Color(0xFFFFFFFF),
+                // Peach Puff
+                Color(0xFF010080)
+              ],
+              begin: Alignment.topCenter,
+              end: Alignment.bottomCenter,
+            ),
+          color: Color(0xFFFFFFFF)
 
-                  ),
-                ),
-              ),
-              Padding(
-                padding: const EdgeInsets.symmetric(vertical: 10),
-                child: TextFormField(
-                  decoration: InputDecoration(
-                    labelText:"Email",
-                    hintText: 'Enter your Email',
-                    prefixIcon: Icon(Icons.email),
-                    border: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(12),
-                      borderSide: (BorderSide(
-                          color: Color(0xFF000000),
-                          width: 10,
-                          style: BorderStyle.solid
-                      )),
-                    ),
-
-                  ),
-                ),
-              ),
-              Padding(
-                padding: const EdgeInsets.symmetric(vertical: 10),
-                child: TextFormField(
-                  decoration: InputDecoration(
-                    labelText:"Password",
-                    hintText: 'Enter Password',
-                    prefixIcon: Icon(Icons.lock),
-                    border: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(12),
-                      borderSide: (BorderSide(
-                          color: Color(0xFF000000),
-                          width: 10,
-                          style: BorderStyle.solid
-                      )),
-                    ),
-
-                  ),
-                ),
-              ),
-              Padding(
-                padding: const EdgeInsets.fromLTRB(0, 30,0,10),
-                child: SizedBox(
-                  height:40,
-                  width: 200,
-                  child: ElevatedButton(onPressed: (){
-                  },
+        ),
+        child: Form(
+          child: Center(
+            child: Padding(
+              padding: const EdgeInsets.all(24.0),
+              child: ListView(
+                shrinkWrap: true,
+                children: [
+                  const SizedBox(height: 20),
+                  _buildTextField("Name", "Enter your name", Icons.person),
+                  const SizedBox(height: 16),
+                  _buildTextField("Email", "Enter your email", Icons.email),
+                  const SizedBox(height: 16),
+                  _buildTextField("Password", "Enter your password", Icons.lock, obscureText: true),
+                  const SizedBox(height: 32),
+                  SizedBox(
+                    height: 50,
+                    child: ElevatedButton(
+                      onPressed: () {},
                       style: ElevatedButton.styleFrom(
-                        backgroundColor: Color(0xFF133F86),
-                        foregroundColor: Color(0xFFFFFFFF)
+                        backgroundColor: const Color(0xFF000000),
+                        foregroundColor: Colors.white,
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(12),
+                        ),
                       ),
-                      child: Text("Submit",style: TextStyle(fontSize: 16),)),
-                ),
+                      child: const Text("Submit", style: TextStyle(fontSize: 16)),
+                    ),
+                  ),
+                  const SizedBox(height: 20),
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      const Text("Already a user?"),
+                      TextButton(
+                        onPressed: () {},
+                        child: const Text("Login"),
+                      )
+                    ],
+                  )
+                ],
               ),
-              Padding(
-                padding: const EdgeInsets.symmetric(vertical: 5),
-                child: Row(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    Text("Already a User?"),
-                    TextButton(onPressed: (){}, child: Text("Login"))
-                  ],
-                ),
-              )
-            ],
+            ),
           ),
         ),
+      ),
+    );
+  }
 
-      )),
+  Widget _buildTextField(String label, String hint, IconData icon, {bool obscureText = false}) {
+    return TextFormField(
+      obscureText: obscureText,
+      decoration: InputDecoration(
+        labelText: label,
+        hintText: hint,
+        hintStyle: TextStyle(
+          color: Colors.grey[500],        // hint text color
+          fontSize: 14,                   // font size
+          fontWeight: FontWeight.w400,    // font weight
+          fontStyle: FontStyle.normal,    // optional: italic text
+          letterSpacing: 0.5,             // optional: spacing between letters
+        ),
+        prefixIcon: Icon(icon, color: Color(0xFF000000)),
+        focusedBorder: OutlineInputBorder(
+          borderSide: const BorderSide(color: Color(0xFF010080), width: 2),
+          borderRadius: BorderRadius.circular(12),
+        ),
+        border: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(12),
+        ),
+      ),
     );
   }
 }
+
+
+
+
+
+
+
+
+
+
+
+// import 'package:flutter/material.dart';
+// class SignupPage extends StatelessWidget {
+//   const SignupPage({super.key});
+//
+//   @override
+//   Widget build(BuildContext context) {
+//     return Scaffold(
+//
+//       backgroundColor: Color(0xFFFAEDE0),
+//       appBar: AppBar(title: Text("SignUp",style: TextStyle(color: Color(0xFFFFFFFF)),),
+//         backgroundColor: Color(0xFFB44FD1),
+//       ),
+//       body: Form(child: Center(
+//         child: Padding(
+//           padding: const EdgeInsets.all(32.0),
+//           child: Column(
+//             children: [
+//               Padding(
+//                 padding: const EdgeInsets.symmetric(vertical: 10),
+//                 child: TextFormField(
+//                   decoration: InputDecoration(
+//                     labelText:"Name",
+//                     hintText: 'Enter your Name',
+//                     prefixIcon: Icon(Icons.person),
+//                     border: OutlineInputBorder(
+//                       borderRadius: BorderRadius.circular(12),
+//                       borderSide: (BorderSide(
+//                           color: Color(0xFF000000),
+//                           width: 10,
+//                           style: BorderStyle.solid
+//                       )),
+//                     ),
+//
+//                   ),
+//                 ),
+//               ),
+//               Padding(
+//                 padding: const EdgeInsets.symmetric(vertical: 10),
+//                 child: TextFormField(
+//                   decoration: InputDecoration(
+//                     labelText:"Email",
+//                     hintText: 'Enter your Email',
+//                     prefixIcon: Icon(Icons.email),
+//                     border: OutlineInputBorder(
+//                       borderRadius: BorderRadius.circular(12),
+//                       borderSide: (BorderSide(
+//                           color: Color(0xFF000000),
+//                           width: 10,
+//                           style: BorderStyle.solid
+//                       )),
+//                     ),
+//
+//                   ),
+//                 ),
+//               ),
+//               Padding(
+//                 padding: const EdgeInsets.symmetric(vertical: 10),
+//                 child: TextFormField(
+//                   decoration: InputDecoration(
+//                     labelText:"Password",
+//                     hintText: 'Enter Password',
+//                     prefixIcon: Icon(Icons.lock),
+//                     border: OutlineInputBorder(
+//                       borderRadius: BorderRadius.circular(12),
+//                       borderSide: (BorderSide(
+//                           color: Color(0xFF000000),
+//                           width: 10,
+//                           style: BorderStyle.solid
+//                       )),
+//                     ),
+//
+//                   ),
+//                 ),
+//               ),
+//               Padding(
+//                 padding: const EdgeInsets.fromLTRB(0, 30,0,10),
+//                 child: SizedBox(
+//                   height:40,
+//                   width: 200,
+//                   child: ElevatedButton(onPressed: (){
+//                   },
+//                       style: ElevatedButton.styleFrom(
+//                           backgroundColor: Color(0xFF133F86),
+//                           foregroundColor: Color(0xFFFFFFFF)
+//                       ),
+//                       child: Text("Submit",style: TextStyle(fontSize: 16),)),
+//                 ),
+//               ),
+//               Padding(
+//                 padding: const EdgeInsets.symmetric(vertical: 5),
+//                 child: Row(
+//                   mainAxisAlignment: MainAxisAlignment.center,
+//                   children: [
+//                     Text("Already a User?"),
+//                     TextButton(onPressed: (){}, child: Text("Login"))
+//                   ],
+//                 ),
+//               )
+//             ],
+//           ),
+//         ),
+//
+//       )),
+//     );
+//   }
+// }
