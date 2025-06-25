@@ -313,3 +313,189 @@ class _dashboardPageState extends State<dashboardPage> {
     );
   }
 }
+
+
+
+
+
+
+
+
+
+
+
+
+
+import 'package:flutter/material.dart';
+class dashboardPage extends StatefulWidget {
+  const dashboardPage({super.key});
+
+  @override
+  State<dashboardPage> createState() => _dashboardPageState();
+}
+
+class _dashboardPageState extends State<dashboardPage> {
+
+  TextEditingController _tacon = TextEditingController();
+  TextEditingController _sacon = TextEditingController();
+  TextEditingController _racon = TextEditingController();
+
+  void remamount(){
+    double total = double.tryParse(_tacon.text)??0.0;
+    double spent = double.tryParse(_sacon.text)??0.0;
+    double rem = total - spent;
+    setState(() {
+      _racon.text=rem.toStringAsFixed(2);
+    });
+  }
+
+
+  @override
+  Widget build(BuildContext context) {
+
+    return Scaffold(
+      appBar: AppBar(
+        leading: IconButton(
+          icon: Icon(Icons.arrow_back_ios_new),color: Color(0xFFF7F4F2),
+          onPressed: (){
+            Navigator.pop(context);
+          },
+        ),
+        title: const Text("DashBoard", style: TextStyle(color: Colors.white)),
+        backgroundColor: const Color(0xFF010080),
+        elevation: 0,
+      ),
+      body: Container(
+
+        decoration: const BoxDecoration(
+            gradient: LinearGradient(
+              colors: [
+                Color(0xFFD3E3FD),
+                Color(0xFFFFFFFF),
+                // Peach Puff
+                Color(0xFF505AD8),
+              ],
+              begin: Alignment.topCenter,
+              end: Alignment.bottomCenter,
+            ),
+            color: Color(0xFFFFFFFF)
+
+        ),
+        child: Center(
+          child: Padding(
+            padding: const EdgeInsets.all(32.0),
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                  Text('Total Income',style: TextStyle(color: Color(0xFF000000),fontWeight: FontWeight.bold),
+                    textAlign: TextAlign.right,
+                  ),
+                SizedBox(
+                  height: 10,
+                ),
+                SizedBox(
+                  width: 400,
+                  height: 40,
+                  child: Material(
+                    elevation: 5,
+                    borderRadius: BorderRadius.circular(12),
+                    child: TextField(
+                      controller: _tacon,
+                      onChanged: (value) => remamount(),
+                      decoration: InputDecoration(
+                        contentPadding: EdgeInsets.symmetric(horizontal: 12, vertical: 10),
+                        border: OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(12),
+                          borderSide: BorderSide.none, // Removes default border
+                        ),
+                        filled: true,
+                        fillColor: Colors.white, // Match button background
+                      ),
+                    ),
+                  ),
+                ),
+                SizedBox(
+                  height: 10,
+                ),
+                 Text('Spent Amount',style: TextStyle(color: Color(0xFF000000),fontWeight: FontWeight.bold),
+                  ),
+
+                SizedBox(
+                  height: 10,
+                ),
+                SizedBox(
+                  width: 400,
+                  height: 40,
+                  child: Material(
+                    elevation: 5,
+                    borderRadius: BorderRadius.circular(12),
+                    child: TextField(
+                      controller: _sacon,
+                      onChanged: (value) => remamount(),
+                      decoration: InputDecoration(
+                        contentPadding: EdgeInsets.symmetric(horizontal: 12, vertical: 10),
+                        border: OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(12),
+                          borderSide: BorderSide.none, // Removes default border
+                        ),
+                        filled: true,
+                        fillColor: Colors.white, // Match button background
+                      ),
+                    ),
+                  ),
+                ),
+                SizedBox(
+                  height: 10,
+                ),
+                Text('Remaining Amount',style: TextStyle(color: Color(0xFF000000),fontWeight: FontWeight.bold),
+                ),
+                SizedBox(
+                  height: 10,
+                ),
+                SizedBox(
+                  width: 400,
+                  height: 40,
+                  child: Material(
+                    elevation: 5,
+                    borderRadius: BorderRadius.circular(12),
+                    child: TextField(
+                      controller: _racon,
+                      readOnly: true,
+                      decoration: InputDecoration(
+                        contentPadding: EdgeInsets.symmetric(horizontal: 12, vertical: 10),
+                        border: OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(12),
+                          borderSide: BorderSide.none, // Removes default border
+                        ),
+                        filled: true,
+                        fillColor: Colors.white, // Match button background
+                      ),
+                    ),
+                  ),
+                ),
+              ],
+            ),
+          ),
+        ),
+      ),
+    );
+  }
+
+  Widget _buildTextField(String label) {
+    return TextFormField(
+      decoration: InputDecoration(
+
+        focusedBorder: OutlineInputBorder(
+          borderSide: const BorderSide(color: Color(0xFF010080), width: 2),
+          borderRadius: BorderRadius.circular(12),
+        ),
+        border: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(12),
+        ),
+      ),
+    );
+  }
+}
+
+
