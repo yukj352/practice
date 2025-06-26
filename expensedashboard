@@ -499,3 +499,16 @@ class _dashboardPageState extends State<dashboardPage> {
 }
 
 
+
+
+
+if (spent > total) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content:
+        Text("Spent amount cannot be more than total income"),
+        backgroundColor: Colors.black,
+        ),
+      );
+      _racon.text = "0.00";
+      return;
+    }
