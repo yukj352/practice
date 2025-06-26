@@ -1,332 +1,6 @@
 import 'package:flutter/material.dart';
-class dashboardPage extends StatelessWidget {
-  const dashboardPage({super.key});
 
-  @override
-  Widget build(BuildContext context) {
-    TextEditingController _ticon= TextEditingController();
-    TextEditingController _sacon= TextEditingController();
-    return Scaffold(
-      appBar: AppBar(
-        leading: IconButton(
-          icon: Icon(Icons.arrow_back_ios_new),color: Color(0xFFF7F4F2),
-          onPressed: (){
-            Navigator.pop(context);
-          },
-        ),
-        title: const Text("DashBoard", style: TextStyle(color: Colors.white)),
-        backgroundColor: const Color(0xFF010080),
-        elevation: 0,
-      ),
-      body: Container(
-
-        decoration: const BoxDecoration(
-            gradient: LinearGradient(
-              colors: [
-                Color(0xFFD3E3FD),
-                Color(0xFFFFFFFF),
-                // Peach Puff
-                Color(0xFF505AD8),
-              ],
-              begin: Alignment.topCenter,
-              end: Alignment.bottomCenter,
-            ),
-            color: Color(0xFFFFFFFF)
-
-        ),
-        child: Center(
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.center,
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-                Text('Total Income',style: TextStyle(color: Color(0xFF000000),fontWeight: FontWeight.bold),
-                  textAlign: TextAlign.right,
-                ),
-              SizedBox(
-                height: 10,
-              ),
-              SizedBox(
-                width: 400,
-                height: 40,
-                child: Material(
-                  elevation: 5,
-                  borderRadius: BorderRadius.circular(12),
-                  child: TextField(
-                    controller: _ticon,
-                    decoration: InputDecoration(
-                      contentPadding: EdgeInsets.symmetric(horizontal: 12, vertical: 10),
-                      border: OutlineInputBorder(
-                        borderRadius: BorderRadius.circular(12),
-                        borderSide: BorderSide.none, // Removes default border
-                      ),
-                      filled: true,
-                      fillColor: Colors.white, // Match button background
-                    ),
-                  ),
-                ),
-              ),
-              SizedBox(
-                height: 10,
-              ),
-               Text('Spent Amount',style: TextStyle(color: Color(0xFF000000),fontWeight: FontWeight.bold),
-                ),
-
-              SizedBox(
-                height: 10,
-              ),
-              SizedBox(
-                width: 400,
-                height: 40,
-                child: Material(
-                  elevation: 5,
-                  borderRadius: BorderRadius.circular(12),
-                  child: TextField(
-                    decoration: InputDecoration(
-                      contentPadding: EdgeInsets.symmetric(horizontal: 12, vertical: 10),
-                      border: OutlineInputBorder(
-                        borderRadius: BorderRadius.circular(12),
-                        borderSide: BorderSide.none, // Removes default border
-                      ),
-                      filled: true,
-                      fillColor: Colors.white, // Match button background
-                    ),
-                  ),
-                ),
-              ),
-              SizedBox(
-                height: 10,
-              ),
-              Text('Remaining Amount',style: TextStyle(color: Color(0xFF000000),fontWeight: FontWeight.bold),
-              ),
-              SizedBox(
-                height: 10,
-              ),
-              SizedBox(
-                width: 400,
-                height: 40,
-                child: Material(
-                  elevation: 5,
-                  borderRadius: BorderRadius.circular(12),
-                  child: TextField(
-                    decoration: InputDecoration(
-                      contentPadding: EdgeInsets.symmetric(horizontal: 12, vertical: 10),
-                      border: OutlineInputBorder(
-                        borderRadius: BorderRadius.circular(12),
-                        borderSide: BorderSide.none, // Removes default border
-                      ),
-                      filled: true,
-                      fillColor: Colors.white, // Match button background
-                    ),
-                  ),
-                ),
-              ),
-            ],
-          ),
-        ),
-      ),
-    );
-  }
-  Widget _buildTextField(String label) {
-    return TextFormField(
-      decoration: InputDecoration(
-
-        focusedBorder: OutlineInputBorder(
-          borderSide: const BorderSide(color: Color(0xFF010080), width: 2),
-          borderRadius: BorderRadius.circular(12),
-        ),
-        border: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(12),
-        ),
-      ),
-    );
-  }
-}
-
-
-
-
-
-
-
-
-
-
-
-
-import 'package:flutter/material.dart';
-class dashboardPage extends StatefulWidget {
-  const dashboardPage({super.key});
-
-  @override
-  State<dashboardPage> createState() => _dashboardPageState();
-}
-
-class _dashboardPageState extends State<dashboardPage> {
-
-  TextEditingController _ticon= TextEditingController();
-  TextEditingController _sacon= TextEditingController();
-  TextEditingController _recon= TextEditingController();
-  
-  void rem_calculate(){
-    double total=double.tryParse(_ticon.text)??0.0;
-    double spent=double.tryParse(_sacon.text)??0.0;
-    double rem=total-spent;
-    setState(() {
-      _recon.text=rem.toStringAsFixed(2);
-    });
-  }
-  
-  
-
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        leading: IconButton(
-          icon: Icon(Icons.arrow_back_ios_new),color: Color(0xFFF7F4F2),
-          onPressed: (){
-            Navigator.pop(context);
-          },
-        ),
-        title: const Text("DashBoard", style: TextStyle(color: Colors.white)),
-        backgroundColor: const Color(0xFF010080),
-        elevation: 0,
-      ),
-      body: Container(
-
-        decoration: const BoxDecoration(
-            gradient: LinearGradient(
-              colors: [
-                Color(0xFFD3E3FD),
-                Color(0xFFFFFFFF),
-                // Peach Puff
-                Color(0xFF505AD8),
-              ],
-              begin: Alignment.topCenter,
-              end: Alignment.bottomCenter,
-            ),
-            color: Color(0xFFFFFFFF)
-
-        ),
-        child: Center(
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.center,
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Text('Total Income',style: TextStyle(color: Color(0xFF000000),fontWeight: FontWeight.bold),
-                textAlign: TextAlign.right,
-              ),
-              SizedBox(
-                height: 10,
-              ),
-              SizedBox(
-                width: 400,
-                height: 40,
-                child: Material(
-                  elevation: 5,
-                  borderRadius: BorderRadius.circular(12),
-                  child: TextField(
-                    controller: _ticon,
-                    decoration: InputDecoration(
-                      contentPadding: EdgeInsets.symmetric(horizontal: 12, vertical: 10),
-                      border: OutlineInputBorder(
-                        borderRadius: BorderRadius.circular(12),
-                        borderSide: BorderSide.none, // Removes default border
-                      ),
-                      filled: true,
-                      fillColor: Colors.white, // Match button background
-                    ),
-                  ),
-                ),
-              ),
-              SizedBox(
-                height: 10,
-              ),
-              Text('Spent Amount',style: TextStyle(color: Color(0xFF000000),fontWeight: FontWeight.bold),
-              ),
-
-              SizedBox(
-                height: 10,
-              ),
-              SizedBox(
-                width: 400,
-                height: 40,
-                child: Material(
-                  elevation: 5,
-                  borderRadius: BorderRadius.circular(12),
-                  child: TextField(
-                    controller: _sacon,
-                    decoration: InputDecoration(
-                      contentPadding: EdgeInsets.symmetric(horizontal: 12, vertical: 10),
-                      border: OutlineInputBorder(
-                        borderRadius: BorderRadius.circular(12),
-                        borderSide: BorderSide.none, // Removes default border
-                      ),
-                      filled: true,
-                      fillColor: Colors.white, // Match button background
-                    ),
-                  ),
-                ),
-              ),
-              SizedBox(
-                height: 20,
-              ),
-              SizedBox(
-                width: 400,
-                height: 40,
-                child: ElevatedButton(onPressed: rem_calculate
-                , child: Text("Calculate")),
-              ),
-              SizedBox(
-                height: 10,
-              ),
-              Text('Remaining Amount',style: TextStyle(color: Color(0xFF000000),fontWeight: FontWeight.bold),
-              ),
-              SizedBox(
-                height: 10,
-              ),
-              SizedBox(
-                width: 400,
-                height: 40,
-                child: Material(
-                  elevation: 5,
-                  borderRadius: BorderRadius.circular(12),
-                  child: TextField(
-                    controller: _recon,
-                    readOnly: true,
-                    decoration: InputDecoration(
-                      contentPadding: EdgeInsets.symmetric(horizontal: 12, vertical: 10),
-                      border: OutlineInputBorder(
-                        borderRadius: BorderRadius.circular(12),
-                        borderSide: BorderSide.none, // Removes default border
-                      ),
-                      filled: true,
-                      fillColor: Colors.white, // Match button background
-                    ),
-                  ),
-                ),
-              ),
-            ],
-          ),
-        ),
-      ),
-    );
-  }
-}
-
-
-
-
-
-
-
-
-
-
-
-
-
-import 'package:flutter/material.dart';
+import 'itemDashboard.dart';
 class dashboardPage extends StatefulWidget {
   const dashboardPage({super.key});
 
@@ -344,9 +18,32 @@ class _dashboardPageState extends State<dashboardPage> {
     double total = double.tryParse(_tacon.text)??0.0;
     double spent = double.tryParse(_sacon.text)??0.0;
     double rem = total - spent;
-    setState(() {
-      _racon.text=rem.toStringAsFixed(2);
-    });
+
+    if(spent>total) {
+      showDialog(context: context,
+        builder: (context) =>
+            AlertDialog(
+              title: Text('Alert'),
+              content: Text('OOPS! Spent is more than Total Income'),
+              actions: [
+                TextButton(onPressed: (){
+          setState(() {
+          _sacon.text='0.0';
+          _racon.text='0.0';
+          });
+          Navigator.pop(context);
+          },
+                    child: Text('OK')
+                )
+              ],
+            ),
+      );
+    }
+    else{
+      setState(() {
+        _racon.text=rem.toStringAsFixed(2);
+      });
+    }
   }
 
 
@@ -355,18 +52,40 @@ class _dashboardPageState extends State<dashboardPage> {
 
     return Scaffold(
       appBar: AppBar(
+          iconTheme: IconThemeData(color: Colors.white),
         leading: IconButton(
           icon: Icon(Icons.arrow_back_ios_new),color: Color(0xFFF7F4F2),
           onPressed: (){
             Navigator.pop(context);
           },
         ),
-        title: const Text("DashBoard", style: TextStyle(color: Colors.white)),
+        title: const Text("FinFlow", style: TextStyle(fontWeight: FontWeight.bold,color: Colors.white)),
         backgroundColor: const Color(0xFF010080),
         elevation: 0,
-      ),
+        actions: [
+          PopupMenuButton<String>(
+          onSelected: (value){
+            if(value=='Item Dashboard'){
+              Navigator.push(context,
+              MaterialPageRoute(builder: (context)=>itemDashboard())
+              );
+            }
+          },
+          itemBuilder: (BuildContext context){
+          return[
+            PopupMenuItem<String>(
+              value: 'Item Dashboard',
+              child: Text('Item Details',style: TextStyle(color: Color(0xFF040104),
+                fontWeight: FontWeight.bold,
+                fontSize: 16,
+              ),),
+            ),
+          ];
+        },
+      )
+    ]
+    ),
       body: Container(
-
         decoration: const BoxDecoration(
             gradient: LinearGradient(
               colors: [
@@ -385,100 +104,143 @@ class _dashboardPageState extends State<dashboardPage> {
           child: Padding(
             padding: const EdgeInsets.all(32.0),
             child: Column(
-              mainAxisAlignment: MainAxisAlignment.center,
+              // mainAxisAlignment: MainAxisAlignment.center,
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                  Text('Total Income',style: TextStyle(color: Color(0xFF000000),fontWeight: FontWeight.bold),
-                    textAlign: TextAlign.right,
-                  ),
-                SizedBox(
-                  height: 10,
-                ),
-                SizedBox(
-                  width: 400,
-                  height: 40,
-                  child: Material(
-                    elevation: 5,
-                    borderRadius: BorderRadius.circular(12),
-                    child: TextField(
-                      controller: _tacon,
-                      onChanged: (value) => remamount(),
-                      decoration: InputDecoration(
-                        contentPadding: EdgeInsets.symmetric(horizontal: 12, vertical: 10),
-                        border: OutlineInputBorder(
-                          borderRadius: BorderRadius.circular(12),
-                          borderSide: BorderSide.none, // Removes default border
-                        ),
-                        filled: true,
-                        fillColor: Colors.white, // Match button background
+                Material(
+                  color: Color(0xFF040104),
+                  borderRadius: BorderRadius.circular(12),
+                  child: Padding(
+                    padding: const EdgeInsets.all(8.0),
+                    child: ListTile(
+                      leading: CircleAvatar(radius: 30,
+                        backgroundImage: AssetImage('assets/img.png'),
+                        backgroundColor: Colors.transparent,
+                      ),
+                      title: Text("Welcome Yukta",style: TextStyle(fontSize: 20,color: Color(0xFFFFFFFF),fontWeight: FontWeight.bold),),
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(12),
                       ),
                     ),
                   ),
                 ),
-                SizedBox(
-                  height: 10,
-                ),
-                 Text('Spent Amount',style: TextStyle(color: Color(0xFF000000),fontWeight: FontWeight.bold),
-                  ),
 
-                SizedBox(
-                  height: 10,
-                ),
-                SizedBox(
-                  width: 400,
-                  height: 40,
-                  child: Material(
-                    elevation: 5,
-                    borderRadius: BorderRadius.circular(12),
-                    child: TextField(
-                      controller: _sacon,
-                      onChanged: (value) => remamount(),
-                      decoration: InputDecoration(
-                        contentPadding: EdgeInsets.symmetric(horizontal: 12, vertical: 10),
-                        border: OutlineInputBorder(
-                          borderRadius: BorderRadius.circular(12),
-                          borderSide: BorderSide.none, // Removes default border
-                        ),
-                        filled: true,
-                        fillColor: Colors.white, // Match button background
-                      ),
-                    ),
+                  SizedBox(
+                    height: 150,
                   ),
-                ),
-                SizedBox(
-                  height: 10,
-                ),
-                Text('Remaining Amount',style: TextStyle(color: Color(0xFF000000),fontWeight: FontWeight.bold),
-                ),
-                SizedBox(
-                  height: 10,
-                ),
-                SizedBox(
-                  width: 400,
-                  height: 40,
-                  child: Material(
-                    elevation: 5,
-                    borderRadius: BorderRadius.circular(12),
-                    child: TextField(
-                      controller: _racon,
-                      readOnly: true,
-                      decoration: InputDecoration(
-                        contentPadding: EdgeInsets.symmetric(horizontal: 12, vertical: 10),
-                        border: OutlineInputBorder(
-                          borderRadius: BorderRadius.circular(12),
-                          borderSide: BorderSide.none, // Removes default border
-                        ),
-                        filled: true,
-                        fillColor: Colors.white, // Match button background
+                Expanded(child:SingleChildScrollView(
+                  child: Column(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text('Total Income',style: TextStyle(color: Color(0xFF000000),fontWeight: FontWeight.bold),
+                        textAlign: TextAlign.right,
                       ),
-                    ),
+                      SizedBox(
+                        height: 10,
+                      ),
+                      SizedBox(
+                        width: 400,
+                        height: 40,
+                        child: Material(
+                          elevation: 5,
+                          borderRadius: BorderRadius.circular(12),
+                          child: TextField(
+                            controller: _tacon,
+                            onChanged: (value) => remamount(),
+                            decoration: InputDecoration(
+                              contentPadding: EdgeInsets.symmetric(horizontal: 12, vertical: 10),
+                              border: OutlineInputBorder(
+                                borderRadius: BorderRadius.circular(12),
+                                borderSide: BorderSide.none, // Removes default border
+                              ),
+                              filled: true,
+                              fillColor: Colors.white, // Match button background
+                            ),
+                          ),
+                        ),
+                      ),
+                      SizedBox(
+                        height: 10,
+                      ),
+                      Text('Spent Amount',style: TextStyle(color: Color(0xFF000000),fontWeight: FontWeight.bold),
+                      ),
+
+                      SizedBox(
+                        height: 10,
+                      ),
+                      SizedBox(
+                        width: 400,
+                        height: 40,
+                        child: Material(
+                          elevation: 5,
+                          borderRadius: BorderRadius.circular(12),
+                          child: TextField(
+                            controller: _sacon,
+                            onChanged: (value) => remamount(),
+                            decoration: InputDecoration(
+                              contentPadding: EdgeInsets.symmetric(horizontal: 12, vertical: 10),
+                              border: OutlineInputBorder(
+                                borderRadius: BorderRadius.circular(12),
+                                borderSide: BorderSide.none, // Removes default border
+                              ),
+                              filled: true,
+                              fillColor: Colors.white, // Match button background
+                            ),
+                          ),
+                        ),
+                      ),
+                      SizedBox(
+                        height: 10,
+                      ),
+                      Text('Remaining Amount',style: TextStyle(color: Color(0xFF000000),fontWeight: FontWeight.bold),
+                      ),
+                      SizedBox(
+                        height: 10,
+                      ),
+                      SizedBox(
+                        width: 400,
+                        height: 40,
+                        child: Material(
+                          elevation: 5,
+                          borderRadius: BorderRadius.circular(12),
+                          child: TextField(
+                            controller: _racon,
+                            readOnly: true,
+                            decoration: InputDecoration(
+                              contentPadding: EdgeInsets.symmetric(horizontal: 12, vertical: 10),
+                              border: OutlineInputBorder(
+                                borderRadius: BorderRadius.circular(12),
+                                borderSide: BorderSide.none, // Removes default border
+                              ),
+                              filled: true,
+                              fillColor: Colors.white, // Match button background
+                            ),
+                          ),
+                        ),
+                      ),
+                    ],
                   ),
+                )
+                      ),
+
+                  ],
                 ),
-              ],
-            ),
-          ),
         ),
       ),
+    ),
+
+
+      floatingActionButtonLocation: FloatingActionButtonLocation.endFloat,
+      floatingActionButton: FloatingActionButton(
+          child: Icon(Icons.add),
+          backgroundColor: Color(0xFF010080),
+          // backgroundColor: Color(0xFF000000),
+          foregroundColor: Color(0xFFFFF7FE),
+          onPressed: (){
+            
+          }),
+
     );
   }
 
@@ -498,17 +260,4 @@ class _dashboardPageState extends State<dashboardPage> {
   }
 }
 
-
-
-
-
-if (spent > total) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content:
-        Text("Spent amount cannot be more than total income"),
-        backgroundColor: Colors.black,
-        ),
-      );
-      _racon.text = "0.00";
-      return;
-    }
+// i want to create a scrren page which contains 7 widget first category of item which is dropdown second item name third amount fourth item quantities fifth date picker which takes year month day date all , sixth a item description box and seventh add button
