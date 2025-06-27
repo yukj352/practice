@@ -1,0 +1,203 @@
+import 'package:flutter/material.dart';
+import 'package:intl/intl.dart';
+
+class addScreenPage extends StatefulWidget {
+  const addScreenPage({super.key});
+
+  @override
+  State<addScreenPage> createState() => _addScreenPageState();
+}
+
+class _addScreenPageState extends State<addScreenPage> {
+  final _formKey = GlobalKey<FormState>();
+  String? _selectedCategory;
+  DateTime selectedDate = DateTime.now();
+
+  TextEditingController _nameController = TextEditingController();
+  TextEditingController _amtController = TextEditingController();
+  TextEditingController _qtyController = TextEditingController();
+  TextEditingController _desController = TextEditingController();
+
+  final List<String> categories = [
+    'food',
+    'travel',
+    'utilities',
+    'health and medical',
+    'savings',
+    'shopping',
+    'housing',
+    'others',
+  ];
+
+  Future<void> _pickDate() async {
+    final DateTime? picked = await showDatePicker(
+      context: context,
+      firstDate: DateTime(2000),
+      lastDate: DateTime(2100),
+    );
+    if (picked != null) {
+      setState(() {
+        selectedDate = picked;
+      });
+    }
+  }
+
+  void _addItem() {
+    if (_formKey.currentState!.validate()) {
+      print('Item Added');
+    }
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(
+        leading: IconButton(
+          icon: Icon(Icons.arrow_back_ios_new),
+          color: Color(0xFFF7F4F2),
+          onPressed: () {
+            Navigator.pop(context);
+          },
+        ),
+        title: const Text(
+          "Add Item To Tracker",
+          style: TextStyle(color: Colors.white),
+        ),
+        backgroundColor: const Color(0xFF010080),
+        elevation: 0,
+      ),
+      body: Container(
+        width: double.infinity,
+        height: double.infinity,
+        decoration: const BoxDecoration(
+          gradient: LinearGradient(
+            colors: [
+              Color(0xFFD3E3FD),
+              Color(0xFFFFFFFF),
+              // Peach Puff
+              Color(0xFF505AD8),
+            ],
+            begin: Alignment.topCenter,
+            end: Alignment.bottomCenter,
+          ),
+          color: Color(0xFFFFFFFF),
+        ),
+        child: SingleChildScrollView(
+          child: Padding(
+            padding: const EdgeInsets.all(16.0),
+            child: Form(
+              key: _formKey,
+              child: Column(
+                       crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                      // padding: EdgeInsets.all(45),
+              Container(
+                        child: Container(
+                          child: DropdownButtonFormField<String>(
+                            dropdownColor: Color(0xFF191D29),
+                            value: _selectedCategory,
+                            style: TextStyle(
+                                color: Color(0xFFF1F6FE),
+                                fontSize: 16
+                            ),
+                            // decoration: InputDecoration(
+                            //   filled: true,
+                            //   fillColor: Color(0xFF040104),
+                            //   border: OutlineInputBorder(
+                            //     borderRadius: BorderRadius.circular(16),
+                            //     borderSide: BorderSide(color: Colors.red, width: 5),
+                            //   ),
+                            //   contentPadding: EdgeInsets.symmetric(
+                            //     horizontal: 16,
+                            //     vertical: 14,
+                            //   ),
+                            // ),
+                            icon: Icon(Icons.arrow_drop_down, color: Color(0xFFFFFFFF)),
+                            hint: Text(
+                              'Select Category',
+                              style: TextStyle(
+                                fontSize: 18,
+                                fontWeight: FontWeight.w900,
+                                color: Color(0xFF1E1F22),
+                              ),
+
+                            ),
+                            onChanged: (val) => setState(() => _selectedCategory = val),
+                            items: categories
+                                .map(
+                                  (cat) =>
+                                  DropdownMenuItem(value: cat, child: Text(cat)),
+                            )
+                                .toList(),
+                            validator: (val) =>
+                            val == null ? 'Please select a category' : null,
+                          ),
+                        ),
+                      ),
+
+                  // SizedBox(height: 16),
+                  TextFormField(
+                    controller: _nameController,
+                    decoration: InputDecoration(labelText: 'Item Name'),
+                    validator: (val) => val!.isEmpty ? 'Enter Item Name' : null,
+                  ),
+                  SizedBox(height: 16),
+                  TextFormField(
+                    controller: _amtController,
+                    decoration: InputDecoration(labelText: 'Amount'),
+                    keyboardType: TextInputType.number,
+                    validator: (val) => val!.isEmpty ? 'Enter Amount' : null,
+                  ),
+                  SizedBox(height: 16),
+                  TextFormField(
+                    controller: _qtyController,
+                    decoration: InputDecoration(labelText: 'Quantity'),
+                    keyboardType: TextInputType.number,
+                  ),
+                  SizedBox(height: 23),
+
+                  Material(
+                    color: Colors.transparent,
+                    child: InkWell(
+                      onTap: _pickDate,
+                      borderRadius: BorderRadius.circular(
+                        4,
+                      ), // Optional: matches rounded border
+                      // Tapping effect
+                      highlightColor: Color(0xFFF7F4F2),
+                      child: InputDecorator(
+                        decoration: InputDecoration(
+                          labelText: 'Date',
+                          border: OutlineInputBorder(),
+                          contentPadding: EdgeInsets.symmetric(
+                            horizontal: 12,
+                            vertical: 16,
+                          ),
+                        ),
+                        child: Text(
+                          DateFormat('dd-MM-yyyy').format(selectedDate),
+                          style: TextStyle(fontSize: 16, color: Colors.black87),
+                        ),
+                      ),
+                    ),
+                  ),
+                  SizedBox(height: 16),
+                  TextFormField(
+                    controller: _desController,
+                    decoration: InputDecoration(labelText: 'Description'),
+                    maxLines: 3,
+                  ),
+                  SizedBox(height: 20),
+                  ElevatedButton(
+                    onPressed: _addItem,
+                    child: Text('Add'),
+                  ),
+                ],
+              ),
+            ),
+          ),
+        ),
+      ),
+    );
+  }
+}
