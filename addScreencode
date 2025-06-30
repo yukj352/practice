@@ -32,6 +32,7 @@ class _addScreenPageState extends State<addScreenPage> {
   Future<void> _pickDate() async {
     final DateTime? picked = await showDatePicker(
       context: context,
+      initialDate: selectedDate,
       firstDate: DateTime(2000),
       lastDate: DateTime(2100),
     );
@@ -71,12 +72,7 @@ class _addScreenPageState extends State<addScreenPage> {
         height: double.infinity,
         decoration: const BoxDecoration(
           gradient: LinearGradient(
-            colors: [
-              Color(0xFFD3E3FD),
-              Color(0xFFFFFFFF),
-              // Peach Puff
-              Color(0xFF505AD8),
-            ],
+            colors: [Color(0xFFD3E3FD), Color(0xFFFFFFFF), Color(0xFF505AD8)],
             begin: Alignment.topCenter,
             end: Alignment.bottomCenter,
           ),
@@ -88,85 +84,88 @@ class _addScreenPageState extends State<addScreenPage> {
             child: Form(
               key: _formKey,
               child: Column(
-                       crossAxisAlignment: CrossAxisAlignment.start,
+                crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                      // padding: EdgeInsets.all(45),
-              Container(
-                        child: Container(
-                          child: DropdownButtonFormField<String>(
-                            dropdownColor: Color(0xFF191D29),
-                            value: _selectedCategory,
-                            style: TextStyle(
-                                color: Color(0xFFF1F6FE),
-                                fontSize: 16
-                            ),
-                            // decoration: InputDecoration(
-                            //   filled: true,
-                            //   fillColor: Color(0xFF040104),
-                            //   border: OutlineInputBorder(
-                            //     borderRadius: BorderRadius.circular(16),
-                            //     borderSide: BorderSide(color: Colors.red, width: 5),
-                            //   ),
-                            //   contentPadding: EdgeInsets.symmetric(
-                            //     horizontal: 16,
-                            //     vertical: 14,
-                            //   ),
-                            // ),
-                            icon: Icon(Icons.arrow_drop_down, color: Color(0xFFFFFFFF)),
-                            hint: Text(
-                              'Select Category',
-                              style: TextStyle(
-                                fontSize: 18,
-                                fontWeight: FontWeight.w900,
-                                color: Color(0xFF1E1F22),
-                              ),
-
-                            ),
-                            onChanged: (val) => setState(() => _selectedCategory = val),
-                            items: categories
-                                .map(
-                                  (cat) =>
-                                  DropdownMenuItem(value: cat, child: Text(cat)),
-                            )
-                                .toList(),
-                            validator: (val) =>
-                            val == null ? 'Please select a category' : null,
-                          ),
-                        ),
-                      ),
-
-                  // SizedBox(height: 16),
+                  // Category dropdown (styled)
+                  const SizedBox(height: 16),
                   TextFormField(
                     controller: _nameController,
-                    decoration: InputDecoration(labelText: 'Item Name'),
+                    decoration: const InputDecoration(
+                      labelText: 'Item Name',
+                      border: OutlineInputBorder(),
+                    ),
                     validator: (val) => val!.isEmpty ? 'Enter Item Name' : null,
                   ),
-                  SizedBox(height: 16),
+                  const SizedBox(height: 16),
+                  SizedBox(
+                    width: double.infinity,
+                    height: 50,
+                    child: PopupMenuButton<String>(
+                      onSelected: (val) =>
+                          setState(() => _selectedCategory = val),
+                      itemBuilder: (context) => categories.map((cat) {
+                        return PopupMenuItem<String>(
+                          value: cat,
+                          child: Text(cat),
+                        );
+                      }).toList(),
+                      // child: ListTile(
+                      //   title: Text(_selectedCategory ?? 'Choose Category'),
+                      //   trailing: Icon(Icons.arrow_drop_down),
+                      // ),
+                      child: Container(
+                        alignment: Alignment.centerLeft,
+                        padding: const EdgeInsets.symmetric(
+                          horizontal: 12.0,
+                          vertical: 8.0,
+                        ),
+                        decoration: BoxDecoration(
+                          border: Border.all(color: Colors.grey),
+                          borderRadius: BorderRadius.circular(4.0),
+                        ),
+                        child: Row(
+                          // mainAxisSize: MainAxisSize.min,
+                          children: [
+                            Expanded(
+                              child: Text(
+                                _selectedCategory ?? 'Choose Category',
+                                style: TextStyle(fontSize: 16.0),
+                              ),
+                            ),
+                            Icon(Icons.arrow_drop_down),
+                          ],
+                        ),
+                      ),
+                    ),
+                  ),
+                  const SizedBox(height: 16),
                   TextFormField(
                     controller: _amtController,
-                    decoration: InputDecoration(labelText: 'Amount'),
+                    decoration: const InputDecoration(
+                      labelText: 'Amount',
+                      border: OutlineInputBorder(),
+                    ),
                     keyboardType: TextInputType.number,
                     validator: (val) => val!.isEmpty ? 'Enter Amount' : null,
                   ),
-                  SizedBox(height: 16),
+                  const SizedBox(height: 16),
                   TextFormField(
                     controller: _qtyController,
-                    decoration: InputDecoration(labelText: 'Quantity'),
+                    decoration: const InputDecoration(
+                      labelText: 'Quantity',
+                      border: OutlineInputBorder(),
+                    ),
                     keyboardType: TextInputType.number,
                   ),
-                  SizedBox(height: 23),
-
+                  const SizedBox(height: 23),
                   Material(
                     color: Colors.transparent,
                     child: InkWell(
                       onTap: _pickDate,
-                      borderRadius: BorderRadius.circular(
-                        4,
-                      ), // Optional: matches rounded border
-                      // Tapping effect
-                      highlightColor: Color(0xFFF7F4F2),
+                      borderRadius: BorderRadius.circular(4),
+                      highlightColor: const Color(0xFFF7F4F2),
                       child: InputDecorator(
-                        decoration: InputDecoration(
+                        decoration: const InputDecoration(
                           labelText: 'Date',
                           border: OutlineInputBorder(),
                           contentPadding: EdgeInsets.symmetric(
@@ -175,22 +174,41 @@ class _addScreenPageState extends State<addScreenPage> {
                           ),
                         ),
                         child: Text(
-                          DateFormat('dd-MM-yyyy').format(selectedDate),
-                          style: TextStyle(fontSize: 16, color: Colors.black87),
+                          DateFormat('dd-MM-yyyy                                                EEE').format(selectedDate),
+                          style: const TextStyle(
+                            fontSize: 16,
+                            color: Colors.black87,
+                          ),
                         ),
                       ),
                     ),
                   ),
-                  SizedBox(height: 16),
+                  const SizedBox(height: 16),
                   TextFormField(
                     controller: _desController,
-                    decoration: InputDecoration(labelText: 'Description'),
+                    decoration: const InputDecoration(
+                      labelText: 'Description',
+                      border: OutlineInputBorder(),
+                      isDense: true
+                    ),
                     maxLines: 3,
+                    textAlignVertical: TextAlignVertical.top,
                   ),
-                  SizedBox(height: 20),
-                  ElevatedButton(
-                    onPressed: _addItem,
-                    child: Text('Add'),
+                  const SizedBox(height: 20),
+                  SizedBox(
+                    height: 40,
+                    width: 100,
+                    child: ElevatedButton(
+                      onPressed: _addItem,
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: const Color(0xFF000000),
+                        foregroundColor: Colors.white,
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(16),
+                        ),
+                      ),
+                      child: const Text('Add',style: TextStyle(fontSize: 16),),
+                    ),
                   ),
                 ],
               ),
@@ -201,3 +219,4 @@ class _addScreenPageState extends State<addScreenPage> {
     );
   }
 }
+
