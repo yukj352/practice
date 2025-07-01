@@ -1,132 +1,160 @@
 import 'package:flutter/material.dart';
 import 'item_model.dart';
+import 'package:intl/intl.dart';
 
-class itemDashboard extends StatefulWidget {
-   const itemDashboard({super.key});
+class itemDetails extends StatefulWidget {
+  const itemDetails({super.key});
 
   @override
-  State<itemDashboard> createState() => _itemDashboardState();
-  }
+  State<itemDetails> createState() => _itemDetailsState();
+}
 
-class _itemDashboardState extends State<itemDashboard> {
+class _itemDetailsState extends State<itemDetails> {
   List<Item> itemList = [];
 
   @override
   void initState() {
     super.initState();
     itemList = [
-      Item(name: "Pen",
-          category: "Shopping",
-          amt: 20,
-          qty: 2,
-          date: DateTime.now(),
-          description: "A cello brand gel pen ")
+      Item(
+        name: "Pen",
+        category: "Shopping",
+        amt: 20,
+        qty: 2,
+        date: DateTime.now(),
+        description: "A cello brand gel pen",
+      ),
+      Item(
+        name: "Notebook",
+        category: "Stationery",
+        amt: 80,
+        qty: 3,
+        date: DateTime.now().subtract(Duration(days: 1)),
+        description: "Classmate notebook 200 pages",
+      ),
     ];
   }
-    @override
-    Widget build(BuildContext context) {
-      return Scaffold(
-        appBar: AppBar(
-          leading: IconButton(
-            icon: Icon(Icons.arrow_back_ios_new),
-            color: Color(0xFFF7F4F2),
-            onPressed: () {
-              Navigator.pop(context);
-            },
-          ),
-          title: const Text(
-            "Item Details",
-            style: TextStyle(color: Colors.white),
-          ),
-          backgroundColor: const Color(0xFF010080),
-          elevation: 0,
-        ),
-        body: Container(
-          width: double.infinity,
-          height: double.infinity,
-          decoration: const BoxDecoration(
-            gradient: LinearGradient(
-              colors: [Color(0xFFD3E3FD), Color(0xFFFFFFFF), Color(0xFF505AD8)],
-              begin: Alignment.topCenter,
-              end: Alignment.bottomCenter,
-            ),
-            color: Color(0xFFFFFFFF),
-          ),
-          child: ListView.builder(
-              itemCount: itemList.length,
-              itemBuilder: (context,index){
-                final item = itemList[index];
-                return Card();
-              }
-          ),
 
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(
+        leading: IconButton(
+          icon: const Icon(Icons.arrow_back_ios_new),
+          color: Color(0xFFF7F4F2),
+          onPressed: () {
+            Navigator.pop(context);
+          },
         ),
-      );
-    }
+        title: const Text(
+          "Item Details",
+          style: TextStyle(color: Colors.white),
+        ),
+        backgroundColor: const Color(0xFF010080),
+        elevation: 0,
+      ),
+      body: Container(
+        width: double.infinity,
+        height: double.infinity,
+        decoration: const BoxDecoration(
+          gradient: LinearGradient(
+            colors: [Color(0xFFD3E3FD), Color(0xFFFFFFFF), Color(0xFF505AD8)],
+            begin: Alignment.topCenter,
+            end: Alignment.bottomCenter,
+          ),
+        ),
+        child: ListView.builder(
+          itemCount: itemList.length,
+          itemBuilder: (context, index) {
+            final item = itemList[index];
+            return Card(
+              color: Color(0xFFFFFFFF),
+              margin: const EdgeInsets.symmetric(vertical: 8, horizontal: 16),
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(16),
+              ),
+              elevation: 10,
+              child: Padding(
+                padding: const EdgeInsets.all(16),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      item.name,
+                      style: const TextStyle(
+                        fontSize: 18,
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
+                    const SizedBox(height: 8),
+                    Align(
+                      alignment: Alignment.centerLeft,
+                      child: Chip(label:
+                      Text(item.category,
+                        style: TextStyle(color: Colors.white),
+                      ),
+                        backgroundColor: Colors.black,
+                      ),
+                    ),
+                    const SizedBox(height: 8),
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        Text('₹${item.amt.toStringAsFixed(2)}',
+                          style: TextStyle(fontWeight: FontWeight.w500),),
+                        Text('Qty: ${item.qty}'),
+                        Text(DateFormat('dd MMM yyyy').format(item.date)),
+                      ],
+                    ),
+                    if (item.description.isNotEmpty) ...[
+                      const SizedBox(height: 12),
+                      Text(
+                        item.description,
+                        style: const TextStyle(color: Colors.black54,fontWeight: FontWeight.w100),
+                      ),
+                    ],
+                    Align(
+                      alignment: Alignment.centerRight,
+                      child: Row(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          Padding(
+                            padding: const EdgeInsets.all(16.0),
+                            child: TextButton(onPressed: () {},
+                                style: TextButton.styleFrom(
+                                  backgroundColor: Colors.black,
+                                  foregroundColor: Colors.white,
+                                  shape: RoundedRectangleBorder(
+                                    borderRadius: BorderRadius.circular(16),
+
+                                  ),
+                                    elevation:2
+                                ),
+                                child: Text('Edit')),
+                          ),
+
+                          TextButton(onPressed: () {},
+                              style: TextButton.styleFrom(
+                                  backgroundColor: Colors.black,
+                                  foregroundColor: Colors.white,
+                                  shape: RoundedRectangleBorder(
+                                    borderRadius: BorderRadius.circular(16),
+
+                                  ),
+                                  elevation:2
+                              ),
+                              child: Text('Delete')),
+                        ],
+                      ),
+                    )
+                  ],
+                ),
+              ),
+            );
+          },
+        ),
+      ),
+    );
   }
+}
 
-
-  // Widget Card(){
-  // return Column();
-  // }
-
-
-
-// ListView.builder(
-// itemCount: itemList.length,
-// itemBuilder: (context, index) {
-// final item = itemList[index];
-// return Card(
-// margin: const EdgeInsets.symmetric(vertical: 8, horizontal: 16),
-// shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
-// elevation: 4,
-// child: Padding(
-// padding: const EdgeInsets.all(16),
-// child: Column(
-// crossAxisAlignment: CrossAxisAlignment.start,
-// children: [
-// // Item name
-// Text(
-// item.name,
-// style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
-// ),
-// const SizedBox(height: 8),
-//
-// // Category chip
-// Chip(label: Text(item.category)),
-//
-// const SizedBox(height: 8),
-//
-// // Row of amount, quantity, and date
-// Row(
-// mainAxisAlignment: MainAxisAlignment.spaceBetween,
-// children: [
-// Text('₹${item.amount}'),
-// Text('Qty: ${item.quantity}'),
-// Text(DateFormat('dd MMM yyyy').format(item.date)),
-// ],
-// ),
-//
-// // Optional description
-// if (item.description != null && item.description.isNotEmpty) ...[
-// const SizedBox(height: 12),
-// Text(
-// item.description,
-// style: const TextStyle(color: Colors.black54),
-// ),
-// ],
-//
-// // Action buttons
-// ButtonBar(
-// alignment: MainAxisAlignment.end,
-// children: [
-// TextButton(onPressed: () {}, child: const Text('Edit')),
-// TextButton(onPressed: () {}, child: const Text('Delete')),
-// ],
-// ),
-// ],
-// ),
-// ),
-// );
-// },
-// )
