@@ -1,7 +1,8 @@
+
 import 'package:final_cal/SignUpPage.dart';
 import 'package:flutter/material.dart';
-
-import 'dashboardPage.dart';
+import 'package:final_cal/dashboardPage.dart';
+import 'package:final_cal/db_helper.dart';
 
 class loginPage extends StatefulWidget {
   const loginPage({super.key});
@@ -11,15 +12,17 @@ class loginPage extends StatefulWidget {
 }
 
 class _loginPageState extends State<loginPage> {
+  final _formKey = GlobalKey<FormState>();
+  final _emailController = TextEditingController();
+  final _passwordController = TextEditingController();
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
         leading: IconButton(
-            icon: Icon(Icons.arrow_back_ios_new),color: Color(0xFFF7F4F2),
-        onPressed: (){
-              Navigator.pop(context);
-        },
+          icon: Icon(Icons.arrow_back_ios_new, color: Color(0xFFF7F4F2)),
+          onPressed: () => Navigator.pop(context),
         ),
         title: const Text("Login", style: TextStyle(color: Colors.white)),
         backgroundColor: const Color(0xFF010080),
@@ -27,155 +30,15 @@ class _loginPageState extends State<loginPage> {
       ),
       body: Container(
         decoration: const BoxDecoration(
-            gradient: LinearGradient(
-              colors: [
-                Color(0xFFD3E3FD),
-                Color(0xFFFFFFFF),
-                // Peach Puff
-                Color(0xFF505AD8),
-              ],
-              begin: Alignment.topCenter,
-              end: Alignment.bottomCenter,
-            ),
-            color: Color(0xFFFFFFFF)
-
-        ),
-        child: Form(
-          child: Center(
-            child: Padding(
-              padding: const EdgeInsets.all(24.0),
-              child: ListView(
-                shrinkWrap: true,
-                children: [
-                  const SizedBox(height: 16),
-                  _buildTextField("Email", "Enter your email", Icons.email),
-                  const SizedBox(height: 16),
-                  _buildTextField("Password", "Enter your password", Icons.lock, obscureText: true),
-                  const SizedBox(height: 32),
-                  SizedBox(
-                    height: 50,
-                    child: ElevatedButton(
-                      onPressed: () {
-                        Navigator.push(context,
-                          MaterialPageRoute(builder: (context)=>dashboardPage()),);
-                      },
-                      style: ElevatedButton.styleFrom(
-                        backgroundColor: const Color(0xFF000000),
-                        foregroundColor: Colors.white,
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(12),
-                        ),
-                      ),
-                      child: const Text("Submit", style: TextStyle(fontSize: 16)),
-                    ),
-                  ),
-                  const SizedBox(height: 20),
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      const Text("New User?"),
-                      TextButton(
-                        onPressed: () {
-                          Navigator.push(context,
-                          MaterialPageRoute(builder: (context)=>SignupPage()),);
-                        },
-                        child: const Text("Create Account"),
-                      )
-                    ],
-                  )
-                ],
-              ),
-            ),
+          gradient: LinearGradient(
+            colors: [
+              Color(0xFFD3E3FD),
+              Color(0xFFFFFFFF),
+              Color(0xFF505AD8),
+            ],
+            begin: Alignment.topCenter,
+            end: Alignment.bottomCenter,
           ),
-        ),
-      ),
-
-    );
-  }
-
-  Widget _buildTextField(String label, String hint, IconData icon, {bool obscureText = false}) {
-    return TextFormField(
-      obscureText: obscureText,
-      decoration: InputDecoration(
-        labelText: label,
-        hintText: hint,
-        hintStyle: TextStyle(
-          color: Colors.grey[500],
-          fontSize: 14,
-          fontWeight: FontWeight.w400,
-          fontStyle: FontStyle.normal,
-          letterSpacing: 0.5,
-        ),
-        prefixIcon: Icon(icon, color: Color(0xFF000000)),
-        focusedBorder: OutlineInputBorder(
-          borderSide: const BorderSide(color: Color(0xFF010080), width: 2),
-          borderRadius: BorderRadius.circular(12),
-        ),
-        border: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(12),
-        ),
-      ),
-    );
-  }
-}
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-import 'package:final_cal/SignUpPage.dart';
-import 'package:flutter/material.dart';
-
-import 'dashboardPage.dart';
-
-class loginPage extends StatefulWidget {
-  const loginPage({super.key});
-
-  @override
-  State<loginPage> createState() => _loginPageState();
-}
-
-class _loginPageState extends State<loginPage> {
-  @override
-  Widget build(BuildContext context) {
-    final _formKey = GlobalKey<FormState>();
-    return Scaffold(
-      appBar: AppBar(
-        leading: IconButton(
-            icon: Icon(Icons.arrow_back_ios_new),color: Color(0xFFF7F4F2),
-        onPressed: (){
-              Navigator.pop(context);
-        },
-        ),
-        title: const Text("Login", style: TextStyle(color: Colors.white)),
-        backgroundColor: const Color(0xFF010080),
-        elevation: 0,
-      ),
-      body: Container(
-        decoration: const BoxDecoration(
-            gradient: LinearGradient(
-              colors: [
-                Color(0xFFD3E3FD),
-                Color(0xFFFFFFFF),
-                // Peach Puff
-                Color(0xFF505AD8),
-              ],
-              begin: Alignment.topCenter,
-              end: Alignment.bottomCenter,
-            ),
-            color: Color(0xFFFFFFFF)
-
         ),
         child: Form(
           key: _formKey,
@@ -186,40 +49,60 @@ class _loginPageState extends State<loginPage> {
                 shrinkWrap: true,
                 children: [
                   const SizedBox(height: 16),
-                  _buildTextField("Email", "Enter your email", Icons.email,
-                  validator: (value){
-                    if(value == null || value.isEmpty){
-                      return 'Please enter your email';
-                    }
-                    if(!RegExp(r'^[\w-\.]+@([\w-]+\.)+[\w]{2,4}$').hasMatch(value)){
-                      return 'Enter a valid email address';
-                    }
-                    return null;
-                  }
+                  _buildTextField(
+                    "Email",
+                    "Enter your email",
+                    Icons.email,
+                    controller: _emailController,
+                    validator: (value) {
+                      if (value == null || value.isEmpty) {
+                        return 'Please enter your email';
+                      }
+                      if (!RegExp(r'^[\w-\.]+@([\w-]+\.)+[\w]{2,4}$').hasMatch(value)) {
+                        return 'Enter a valid email address';
+                      }
+                      return null;
+                    },
                   ),
                   const SizedBox(height: 16),
-                  _buildTextField("Password", "Enter your password", Icons.lock, obscureText: true,
-                  validator: (value){
-                    if(value == null || value.isEmpty){
-                      return 'Please enter your password';
-                    }
-                    if(value.length<8){
-                      return 'Password must be atleast 6 characters';
-                    }
-                    return null;
-                  }
+                  _buildTextField(
+                    "Password",
+                    "Enter your password",
+                    Icons.lock,
+                    obscureText: true,
+                    controller: _passwordController,
+                    validator: (value) {
+                      if (value == null || value.isEmpty) {
+                        return 'Please enter your password';
+                      }
+                      if (value.length < 8) {
+                        return 'Password must be at least 8 characters';
+                      }
+                      return null;
+                    },
                   ),
                   const SizedBox(height: 32),
                   SizedBox(
                     height: 50,
                     child: ElevatedButton(
-                      onPressed: () {
+                      onPressed: () async {
                         if (_formKey.currentState!.validate()) {
-                          print('Form is valid!');
-                          Navigator.push(context,
-                            MaterialPageRoute(builder: (context)=>dashboardPage()),);
-                        } else {
-                          print('Form is invalid!');
+                          final email = _emailController.text.trim();
+                          final password = _passwordController.text.trim();
+
+                          final user = await DatabaseHelper().authenticate(email, password);
+
+                          if (user != null) {
+                            Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                  builder: (context) => dashboardPage(userId: user['id'])),
+                            );
+                          } else {
+                            ScaffoldMessenger.of(context).showSnackBar(
+                              SnackBar(content: Text('Invalid email or password')),
+                            );
+                          }
                         }
                       },
                       style: ElevatedButton.styleFrom(
@@ -239,8 +122,10 @@ class _loginPageState extends State<loginPage> {
                       const Text("New User?"),
                       TextButton(
                         onPressed: () {
-                          Navigator.push(context,
-                          MaterialPageRoute(builder: (context)=>SignupPage()),);
+                          Navigator.push(
+                            context,
+                            MaterialPageRoute(builder: (context) => SignupPage()),
+                          );
                         },
                         child: const Text("Create Account"),
                       )
@@ -252,14 +137,19 @@ class _loginPageState extends State<loginPage> {
           ),
         ),
       ),
-
     );
   }
 
-  Widget _buildTextField(String label, String hint, IconData icon, {bool obscureText = false,
-    required String? Function(String?) validator
-  }) {
+  Widget _buildTextField(
+      String label,
+      String hint,
+      IconData icon, {
+        bool obscureText = false,
+        required String? Function(String?) validator,
+        required TextEditingController controller,
+      }) {
     return TextFormField(
+      controller: controller,
       validator: validator,
       obscureText: obscureText,
       decoration: InputDecoration(
@@ -269,7 +159,6 @@ class _loginPageState extends State<loginPage> {
           color: Colors.grey[500],
           fontSize: 14,
           fontWeight: FontWeight.w400,
-          fontStyle: FontStyle.normal,
           letterSpacing: 0.5,
         ),
         prefixIcon: Icon(icon, color: Color(0xFF000000)),
@@ -284,4 +173,3 @@ class _loginPageState extends State<loginPage> {
     );
   }
 }
-
