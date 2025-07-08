@@ -1,0 +1,25 @@
+#include <iostream>
+using namespace std;
+#include <vector>
+int main() {
+    int n;
+    vector<int> vec;
+    cout<<"enter size of array"<<endl;
+    cin>>n;
+    int arr[n];
+    cout<<"enter the array elements"<<endl;
+    for(int i=0;i<n;i++)
+    {
+    cin>>arr[i];
+    } 
+    int currentsum=0;
+    for(int i=0;i<n;i++){
+        currentsum += arr[i];
+        vec.push_back(currentsum);
+    }
+    cout<<"the prefix array sum is"<<endl;
+    for(int i=0;i<vec.size();i++){
+        cout<<vec[i]<<" ";
+    }
+    return 0;
+}
