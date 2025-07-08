@@ -1,3 +1,5 @@
+
+
 import 'package:flutter/material.dart';
 import 'SignUpPage.dart';
 
@@ -23,7 +25,7 @@ class _ExpenseTrackerSplashScreenState extends State<ExpenseTrackerSplashScreen>
     Future.delayed(const Duration(seconds: 3), () {
       Navigator.pushReplacement(
         context,
-        MaterialPageRoute(builder: (context) => const SignupPage()),
+        MaterialPageRoute(builder: (context) => SignupPage()),
       );
     });
   }
@@ -46,7 +48,7 @@ class _ExpenseTrackerSplashScreenState extends State<ExpenseTrackerSplashScreen>
               const CircleAvatar(
                 radius: 70,
                 backgroundColor: Colors.transparent,
-                backgroundImage: AssetImage('mainlogo.png'),
+                backgroundImage: AssetImage('assets/img.png'),
               ),
               AnimatedOpacity(
                 opacity: _opacity,
