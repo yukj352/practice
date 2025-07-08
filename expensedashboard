@@ -1,8 +1,11 @@
 import 'package:final_cal/addScreenPage.dart';
 import 'package:flutter/material.dart';
 import 'itemDashboard.dart';
+import 'package:final_cal/db_helper.dart';
+
 class dashboardPage extends StatefulWidget {
-  const dashboardPage({super.key});
+  final int userId;
+  const dashboardPage({super.key,required this.userId});
 
   @override
   State<dashboardPage> createState() => _dashboardPageState();
@@ -14,9 +17,20 @@ class _dashboardPageState extends State<dashboardPage> {
   TextEditingController _sacon = TextEditingController();
   TextEditingController _racon = TextEditingController();
 
+  @override
+  void initState(){
+    super.initState();
+    WidgetsBinding.instance.addPostFrameCallback((_){
+      _loadTotalSpent();
+    });
+  }
+
+
   void remamount(){
     double total = double.tryParse(_tacon.text)??0.0;
     double spent = double.tryParse(_sacon.text)??0.0;
+
+    if(total == 0.0) return;
     double rem = total - spent;
 
     if(spent>total) {
@@ -46,6 +60,22 @@ class _dashboardPageState extends State<dashboardPage> {
     }
   }
 
+  Future <void> _loadTotalSpent() async {
+    final data = await DatabaseHelper().getExpenses(widget.userId);
+    double totalSpent = 0.0;
+
+    for(var item in data){
+      totalSpent += (item['amount'] as num).toDouble();
+    }
+    if(mounted){
+      setState(() {
+        _sacon.text = totalSpent.toStringAsFixed(2);
+      });
+      remamount();
+    }
+  }
+
+
 
   @override
   Widget build(BuildContext context) {
@@ -64,11 +94,12 @@ class _dashboardPageState extends State<dashboardPage> {
         elevation: 0,
         actions: [
           PopupMenuButton<String>(
-          onSelected: (value){
+          onSelected: (value) async {
             if(value=='Item Dashboard'){
-              Navigator.push(context,
-              MaterialPageRoute(builder: (context)=>itemDashboard())
+              await Navigator.push(context,
+              MaterialPageRoute(builder: (context)=>itemDashboard(userId: widget.userId,))
               );
+              _loadTotalSpent();
             }
           },
           itemBuilder: (BuildContext context){
@@ -177,8 +208,9 @@ class _dashboardPageState extends State<dashboardPage> {
                           borderRadius: BorderRadius.circular(12),
                           child: TextField(
                             controller: _sacon,
-                            onChanged: (value) => remamount(),
+                            readOnly: true,
                             decoration: InputDecoration(
+                              hintText: "Auto-Calculated",
                               contentPadding: EdgeInsets.symmetric(horizontal: 12, vertical: 10),
                               border: OutlineInputBorder(
                                 borderRadius: BorderRadius.circular(12),
@@ -207,6 +239,7 @@ class _dashboardPageState extends State<dashboardPage> {
                           child: TextField(
                             controller: _racon,
                             readOnly: true,
+                            // onChanged: remamount(),
                             decoration: InputDecoration(
                               contentPadding: EdgeInsets.symmetric(horizontal: 12, vertical: 10),
                               border: OutlineInputBorder(
@@ -239,10 +272,11 @@ class _dashboardPageState extends State<dashboardPage> {
           backgroundColor: Color(0xFF010080),
           // backgroundColor: Color(0xFF000000),
           foregroundColor: Color(0xFFFFF7FE),
-          onPressed: (){
-            Navigator.push(context,
-            MaterialPageRoute(builder: (context)=> addScreenPage()),
+          onPressed: () async {
+            await Navigator.push(context,
+            MaterialPageRoute(builder: (context)=> addScreenPage(userId: widget.userId),),
             );
+            _loadTotalSpent();
           }),
     );
   }
