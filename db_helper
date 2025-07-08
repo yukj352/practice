@@ -114,16 +114,20 @@ class DatabaseHelper {
     );
   }
 
-  Future<int> updateExpense(Map<String, dynamic> data) async {
+  Future<int> updateExpense(int id,Map<String, dynamic> expense) async {
     final db = await database;
     return await db.update(
       'EXPENSES',
-      data,
+      expense,
       where: 'id = ?',
-      whereArgs: [data['id']],
+      whereArgs: [id],
     );
   }
 }
+
+
+
+
 
 
 
