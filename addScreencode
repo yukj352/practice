@@ -1,8 +1,14 @@
+
+
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
+import 'package:final_cal/db_helper.dart';
+import 'item_model.dart';
 
 class addScreenPage extends StatefulWidget {
-  const addScreenPage({super.key});
+  final int userId;
+  final Item? item;
+  const addScreenPage({super.key,required this.userId,this.item});
 
   @override
   State<addScreenPage> createState() => _addScreenPageState();
@@ -13,10 +19,71 @@ class _addScreenPageState extends State<addScreenPage> {
   String? _selectedCategory;
   DateTime selectedDate = DateTime.now();
 
+  //submit expense database connectivity
+  void _submitExpense() async{
+    if(_formKey.currentState!.validate() &&
+        _selectedCategory !=null &&
+        selectedDate!= null){
+      final expense={
+        'userId': widget.userId,
+        'name': _nameController.text.trim(),
+        'category': _selectedCategory,
+        'amount': double.parse(_amtController.text),
+        'quantity': double.parse(_qtyController.text),
+        'date': DateFormat('dd-mm-yyyy').format(selectedDate!),
+        'description': _desController.text.trim(),
+      };
+      if(widget.item == null){
+        await DatabaseHelper().addExpense(expense);
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('Item added successfully!'),
+            backgroundColor: Colors.black87,
+          ),
+        );
+      }
+      else{
+        await DatabaseHelper().updateExpense(widget.item!.id,expense);
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('Item updated successfully!'),
+            backgroundColor: Colors.black87,
+          ),
+        );
+      }
+
+
+      await Future.delayed(Duration(milliseconds: 800));
+      Navigator.pop(context,true);
+    }
+    else{
+      ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text
+            ('Please fill out the details'),
+          ));
+    }
+  }
+
+
   TextEditingController _nameController = TextEditingController();
   TextEditingController _amtController = TextEditingController();
   TextEditingController _qtyController = TextEditingController();
   TextEditingController _desController = TextEditingController();
+
+  @override
+  void initState(){
+    super.initState();
+
+    if(widget.item!= null){
+      final item = widget.item!;
+      _nameController.text = item.name;
+      _amtController.text = item.amt.toString();
+      _qtyController.text = item.qty.toString();
+      _desController.text = item.description;
+      _selectedCategory = item.category;
+      selectedDate = item.date;
+    }
+  }
+
+
 
   final List<String> categories = [
     'food',
@@ -60,8 +127,8 @@ class _addScreenPageState extends State<addScreenPage> {
             Navigator.pop(context);
           },
         ),
-        title: const Text(
-          "Add Item To Tracker",
+        title:  Text(
+          widget.item == null ? "Add Item To Tracker" : "Edit Item",
           style: TextStyle(color: Colors.white),
         ),
         backgroundColor: const Color(0xFF010080),
@@ -174,7 +241,7 @@ class _addScreenPageState extends State<addScreenPage> {
                           ),
                         ),
                         child: Text(
-                          DateFormat('dd-MM-yyyy                                                EEE').format(selectedDate),
+                          DateFormat('yyyy-MM--dd                                                EEE').format(selectedDate),
                           style: const TextStyle(
                             fontSize: 16,
                             color: Colors.black87,
@@ -197,9 +264,9 @@ class _addScreenPageState extends State<addScreenPage> {
                   const SizedBox(height: 20),
                   SizedBox(
                     height: 40,
-                    width: 100,
+                    width: 90,
                     child: ElevatedButton(
-                      onPressed: _addItem,
+                      onPressed: _submitExpense,
                       style: ElevatedButton.styleFrom(
                         backgroundColor: const Color(0xFF000000),
                         foregroundColor: Colors.white,
@@ -207,7 +274,8 @@ class _addScreenPageState extends State<addScreenPage> {
                           borderRadius: BorderRadius.circular(16),
                         ),
                       ),
-                      child: const Text('Add',style: TextStyle(fontSize: 16),),
+                      child:  Text(
+                        widget.item == null ? 'Add' : 'Edit',style: TextStyle(fontSize: 16),),
                     ),
                   ),
                 ],
@@ -219,4 +287,3 @@ class _addScreenPageState extends State<addScreenPage> {
     );
   }
 }
-
