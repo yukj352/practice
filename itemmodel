@@ -1,4 +1,5 @@
 class Item{
+  final int id;
   final String name;
   final String category;
   final double amt;
@@ -7,6 +8,7 @@ class Item{
   final String description;
 
   Item({
+    required this.id,
    required this.name,
     required this.category,
     required this.amt,
@@ -14,5 +16,4 @@ class Item{
     required this.date,
     required this.description,
 });
-
 }
