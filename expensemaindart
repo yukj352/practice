@@ -1,6 +1,15 @@
+
+
 import 'package:final_cal/ExpenseTrackerSplashScreen.dart';
+import 'package:final_cal/SignUpPage.dart';
+import 'package:final_cal/addScreenPage.dart';
 import 'package:final_cal/calculator.dart';
+import 'package:final_cal/dashboardPage.dart';
+import 'package:final_cal/itemDashboard.dart';
+import 'package:final_cal/login.dart';
 import 'package:flutter/material.dart';
+import 'package:final_cal/item_model.dart';
+
 
 void main() {
   runApp(const MyApp());
@@ -11,11 +20,13 @@ class MyApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-  return MaterialApp(
+
+    return MaterialApp(
     debugShowCheckedModeBanner:false,
-    home: ExpensetrackerSplashScreen(),
+    home: dashboardPage(userId: 1,),
   );
   }
 }
+
 
 
