@@ -1,73 +1,102 @@
-import 'package:final_cal/addScreenPage.dart';
 import 'package:flutter/material.dart';
-import 'itemDashboard.dart';
+import 'package:shared_preferences/shared_preferences.dart';
+import 'package:final_cal/addScreenPage.dart';
 import 'package:final_cal/db_helper.dart';
+import 'itemDashboard.dart';
+import 'login.dart';
+import 'profilePage.dart';  // <-- Make sure you have this file and correct path
+import 'dart:io';
+import 'package:image_picker/image_picker.dart';
+
 
 class dashboardPage extends StatefulWidget {
   final int userId;
-  const dashboardPage({super.key,required this.userId});
+  const dashboardPage({super.key, required this.userId});
 
   @override
   State<dashboardPage> createState() => _dashboardPageState();
 }
 
 class _dashboardPageState extends State<dashboardPage> {
+  File? _profileImage;
+  final ImagePicker _picker = ImagePicker();
+  int _selectedIndex = 0; // Home tab index
 
   TextEditingController _tacon = TextEditingController();
   TextEditingController _sacon = TextEditingController();
   TextEditingController _racon = TextEditingController();
 
+  String? _username;
+
   @override
-  void initState(){
+  void initState() {
     super.initState();
-    WidgetsBinding.instance.addPostFrameCallback((_){
+    WidgetsBinding.instance.addPostFrameCallback((_) {
       _loadTotalSpent();
+      _loadUserName();
     });
   }
 
+  Future<void> _loadUserName() async {
+    final prefs = await SharedPreferences.getInstance();
+    setState(() {
+      _username = prefs.getString('username') ?? 'User';
+    });
+  }
 
-  void remamount(){
-    double total = double.tryParse(_tacon.text)??0.0;
-    double spent = double.tryParse(_sacon.text)??0.0;
+  Future<void> _pickImage() async {
+    final pickedFile = await _picker.pickImage(source: ImageSource.gallery, imageQuality: 70);
 
-    if(total == 0.0) return;
-    double rem = total - spent;
-
-    if(spent>total) {
-      showDialog(context: context,
-        builder: (context) =>
-            AlertDialog(
-              title: Text('Alert'),
-              content: Text('OOPS! Spent is more than Total Income'),
-              actions: [
-                TextButton(onPressed: (){
-          setState(() {
-          _sacon.text='0.0';
-          _racon.text='0.0';
-          });
-          Navigator.pop(context);
-          },
-                    child: Text('OK')
-                )
-              ],
-            ),
-      );
-    }
-    else{
+    if (pickedFile != null) {
       setState(() {
-        _racon.text=rem.toStringAsFixed(2);
+        _profileImage = File(pickedFile.path);
       });
     }
   }
 
-  Future <void> _loadTotalSpent() async {
+
+  void remamount() {
+    double total = double.tryParse(_tacon.text) ?? 0.0;
+    double spent = double.tryParse(_sacon.text) ?? 0.0;
+
+    if (total == 0.0) return;
+    double rem = total - spent;
+
+    if (spent > total) {
+      showDialog(
+        context: context,
+        builder: (context) => AlertDialog(
+          title: Text('Alert'),
+          content: Text('OOPS! Spent is more than Total Income'),
+          actions: [
+            TextButton(
+              onPressed: () {
+                setState(() {
+                  _sacon.text = '0.0';
+                  _racon.text = '0.0';
+                });
+                Navigator.pop(context);
+              },
+              child: Text('OK'),
+            ),
+          ],
+        ),
+      );
+    } else {
+      setState(() {
+        _racon.text = rem.toStringAsFixed(2);
+      });
+    }
+  }
+
+  Future<void> _loadTotalSpent() async {
     final data = await DatabaseHelper().getExpenses(widget.userId);
     double totalSpent = 0.0;
 
-    for(var item in data){
+    for (var item in data) {
       totalSpent += (item['amount'] as num).toDouble();
     }
-    if(mounted){
+    if (mounted) {
       setState(() {
         _sacon.text = totalSpent.toStringAsFixed(2);
       });
@@ -75,226 +104,324 @@ class _dashboardPageState extends State<dashboardPage> {
     }
   }
 
+  void _onItemTapped(int index) {
+    if (index == _selectedIndex) return; // no action if current tab tapped
 
+    if (index == 0) {
+      // Home tab: pushReplacement to dashboardPage
+      Navigator.pushReplacement(
+        context,
+        MaterialPageRoute(builder: (_) => dashboardPage(userId: widget.userId)),
+      );
+    } else if (index == 1) {
+      // Search tab: pushReplacement to itemDashboard
+      Navigator.pushReplacement(
+        context,
+        MaterialPageRoute(builder: (_) => itemDashboard(userId: widget.userId)),
+      );
+    } else if (index == 2) {
+      // Profile tab: pushReplacement to profilePage
+      Navigator.pushReplacement(
+        context,
+        MaterialPageRoute(builder: (_) => profilePage(userId: widget.userId)),
+      );
+    }
+  }
+
+  Widget _buildInputField(TextEditingController controller, {bool enabled = false}) {
+    return SizedBox(
+      height: 40,
+      width: double.infinity,
+      child: Material(
+        elevation: 5,
+        borderRadius: BorderRadius.circular(12),
+        child: TextField(
+          controller: controller,
+          readOnly: !enabled,
+          onChanged: enabled ? (_) => remamount() : null,
+          decoration: InputDecoration(
+            contentPadding: EdgeInsets.symmetric(horizontal: 12),
+            filled: true,
+            fillColor: Colors.white,
+            border: OutlineInputBorder(
+              borderRadius: BorderRadius.circular(12),
+              borderSide: BorderSide.none,
+            ),
+          ),
+        ),
+      ),
+    );
+  }
 
   @override
   Widget build(BuildContext context) {
-
     return Scaffold(
       appBar: AppBar(
-          iconTheme: IconThemeData(color: Colors.white),
-        leading: IconButton(
-          icon: Icon(Icons.arrow_back_ios_new),color: Color(0xFFF7F4F2),
-          onPressed: (){
-            Navigator.pop(context);
-          },
+        iconTheme: IconThemeData(color: Colors.white),
+        leading: Builder(
+          builder: (context) => IconButton(
+            icon: Icon(Icons.menu),       // <-- Hamburger drawer icon
+            color: Color(0xFFF7F4F2),
+            onPressed: () {
+              Scaffold.of(context).openDrawer();  // <-- Open the drawer
+            },
+          ),
         ),
-        title: const Text("FinFlow", style: TextStyle(fontWeight: FontWeight.bold,color: Colors.white)),
+        title: const Text(
+          "FinFlow",
+          style: TextStyle(fontWeight: FontWeight.bold, color: Colors.white),
+        ),
         backgroundColor: const Color(0xFF010080),
         elevation: 0,
         actions: [
           PopupMenuButton<String>(
-          onSelected: (value) async {
-            if(value=='Item Dashboard'){
-              await Navigator.push(context,
-              MaterialPageRoute(builder: (context)=>itemDashboard(userId: widget.userId,))
-              );
-              _loadTotalSpent();
-            }
-          },
-          itemBuilder: (BuildContext context){
-          return[
-            PopupMenuItem<String>(
-              value: 'Item Dashboard',
-              child: Text('Item Details',style: TextStyle(color: Color(0xFF040104),
-                fontWeight: FontWeight.bold,
-                fontSize: 16,
-              ),),
-            ),
-          ];
-        },
-      )
-    ]
-    ),
-      body: Container(
-        decoration: const BoxDecoration(
-            gradient: LinearGradient(
-              colors: [
-                Color(0xFFD3E3FD),
-                Color(0xFFFFFFFF),
-                // Peach Puff
-                Color(0xFF505AD8),
-              ],
-              begin: Alignment.topCenter,
-              end: Alignment.bottomCenter,
-            ),
-            color: Color(0xFFFFFFFF)
-
-        ),
-        child: Center(
-          child: Padding(
-            padding: const EdgeInsets.all(32.0),
-            child: Column(
-              // mainAxisAlignment: MainAxisAlignment.center,
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Material(
-                  color: Color(0xFF040104),
-                  borderRadius: BorderRadius.circular(12),
-                  child: Padding(
-                    padding: const EdgeInsets.all(8.0),
-                    child: ListTile(
-                      leading: CircleAvatar(radius: 30,
-                        backgroundImage: AssetImage('assets/img.png'),
-                        backgroundColor: Colors.transparent,
-                      ),
-                      title: Text("Welcome Yukta",style: TextStyle(fontSize: 20,color: Color(0xFFFFFFFF),fontWeight: FontWeight.bold),),
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(12),
-                      ),
+            onSelected: (value) async {
+              if (value == 'Item Dashboard') {
+                await Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (context) => itemDashboard(userId: widget.userId),
+                  ),
+                );
+                _loadTotalSpent();
+              }
+            },
+            itemBuilder: (BuildContext context) {
+              return [
+                PopupMenuItem<String>(
+                  value: 'Item Dashboard',
+                  child: Text(
+                    'Item Details',
+                    style: TextStyle(
+                      color: Color(0xFF040104),
+                      fontWeight: FontWeight.bold,
+                      fontSize: 16,
                     ),
                   ),
                 ),
+              ];
+            },
+          )
+        ],
+      ),
 
-                  SizedBox(
-                    height: 150,
+
+      drawer: Drawer(
+        child: ListView(
+          padding: EdgeInsets.zero,
+          children: [
+            UserAccountsDrawerHeader(
+              decoration: BoxDecoration(
+                color: Color(0xFF010080),
+              ),
+              accountName: Text(_username ?? 'User'),
+              accountEmail: null,
+              currentAccountPicture: GestureDetector(
+                onTap: _pickImage,
+                child:  CircleAvatar(
+                  backgroundImage: _profileImage != null
+                      ? FileImage(_profileImage!)
+                      : AssetImage('assets/img.png') as ImageProvider,
+                  backgroundColor: Colors.transparent,
+                ),
+              ),
+
+            ),
+            ListTile(
+              leading: Icon(Icons.dashboard),
+              title: Text('Dashboard'),
+              onTap: () {
+                Navigator.pop(context); // close drawer
+                if (_selectedIndex != 0) {
+                  Navigator.pushReplacement(
+                    context,
+                    MaterialPageRoute(builder: (_) => dashboardPage(userId: widget.userId)),
+                  );
+                }
+              },
+            ),
+            ListTile(
+              leading: Icon(Icons.list),
+              title: Text('All Items'),
+              onTap: () {
+                Navigator.pop(context);
+                if (_selectedIndex != 1) {
+                  Navigator.pushReplacement(
+                    context,
+                    MaterialPageRoute(builder: (_) => itemDashboard(userId: widget.userId)),
+                  );
+                }
+              },
+            ),
+            ListTile(
+              leading: Icon(Icons.person),
+              title: Text('Profile'),
+              onTap: () {
+                Navigator.pop(context);
+                if (_selectedIndex != 2) {
+                  Navigator.pushReplacement(
+                    context,
+                    MaterialPageRoute(builder: (_) => profilePage(userId: widget.userId)),
+                  );
+                }
+              },
+            ),
+            Divider(),
+            ListTile(
+              leading: Icon(Icons.settings),
+              title: Text('Settings'),
+              onTap: () {
+                Navigator.pop(context);
+                // TODO: Add settings page navigation if needed
+                ScaffoldMessenger.of(context).showSnackBar(
+                  SnackBar(content: Text('Settings tapped')),
+                );
+              },
+            ),
+            // ListTile(
+            //   leading: Icon(Icons.refresh),
+            //   title: Text('Reset'),
+            //   onTap: () {
+            //     Navigator.pop(context);
+            //     _resetValues();
+            //     ScaffoldMessenger.of(context).showSnackBar(
+            //       SnackBar(content: Text('Values reset')),
+            //     );
+            //   },
+            // ),
+            ListTile(
+              leading: Icon(Icons.logout),
+              title: Text('Logout'),
+              onTap: () async {
+                Navigator.pop(context);
+                final prefs = await SharedPreferences.getInstance();
+                await prefs.clear();
+                Navigator.pushAndRemoveUntil(
+                  context,
+                  MaterialPageRoute(builder: (_) => loginPage()),
+                      (_) => false,
+                );
+              },
+            ),
+          ],
+        ),
+      ),
+
+      body: Container(
+        decoration: const BoxDecoration(
+          gradient: LinearGradient(
+            colors: [
+              Color(0xFFD3E3FD),
+              Color(0xFFFFFFFF),
+              Color(0xFF505AD8),
+            ],
+            begin: Alignment.topCenter,
+            end: Alignment.bottomCenter,
+          ),
+        ),
+        child: Padding(
+          padding: const EdgeInsets.all(32.0),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Material(
+                color: Color(0xFF040104),
+                borderRadius: BorderRadius.circular(12),
+                child: Padding(
+                  padding: const EdgeInsets.all(8.0),
+                  child: ListTile(
+                    leading: CircleAvatar(
+                      radius: 30,
+                      backgroundImage: AssetImage('assets/img.png'),
+                      backgroundColor: Colors.transparent,
+                    ),
+                    title: Text(
+                      "Welcome ${_username ?? ''}",
+                      style: TextStyle(
+                          fontSize: 20,
+                          color: Colors.white,
+                          fontWeight: FontWeight.bold),
+                    ),
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(12),
+                    ),
                   ),
-                Expanded(child:SingleChildScrollView(
+                ),
+              ),
+              SizedBox(height: 30),
+
+              Expanded(
+                child: SingleChildScrollView(
                   child: Column(
-                    mainAxisAlignment: MainAxisAlignment.center,
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      Text('Total Income',style: TextStyle(color: Color(0xFF000000),fontWeight: FontWeight.bold),
-                        textAlign: TextAlign.right,
-                      ),
-                      SizedBox(
-                        height: 10,
-                      ),
-                      SizedBox(
-                        width: 400,
-                        height: 40,
-                        child: Material(
-                          elevation: 5,
-                          borderRadius: BorderRadius.circular(12),
-                          child: TextField(
-                            controller: _tacon,
-                            onChanged: (value) => remamount(),
-                            decoration: InputDecoration(
-                              contentPadding: EdgeInsets.symmetric(horizontal: 12, vertical: 10),
-                              border: OutlineInputBorder(
-                                borderRadius: BorderRadius.circular(12),
-                                borderSide: BorderSide.none, // Removes default border
-                              ),
-                              filled: true,
-                              fillColor: Colors.white, // Match button background
-                            ),
-                          ),
-                        ),
-                      ),
-                      SizedBox(
-                        height: 10,
-                      ),
-                      Text('Spent Amount',style: TextStyle(color: Color(0xFF000000),fontWeight: FontWeight.bold),
+                      Text('Total Income', style: TextStyle(fontWeight: FontWeight.bold)),
+                      SizedBox(height: 10),
+                      Container(
+                        width: 300,
+                        alignment: Alignment.centerLeft,
+                        child: _buildInputField(_tacon, enabled: true),
                       ),
 
-                      SizedBox(
-                        height: 10,
+                      SizedBox(height: 10),
+                      Text('Spent Amount', style: TextStyle(fontWeight: FontWeight.bold)),
+                      SizedBox(height: 10),
+                      Container(
+                        width: 300,
+                        alignment: Alignment.centerLeft,
+                        child: _buildInputField(_sacon),
                       ),
-                      SizedBox(
-                        width: 400,
-                        height: 40,
-                        child: Material(
-                          elevation: 5,
-                          borderRadius: BorderRadius.circular(12),
-                          child: TextField(
-                            controller: _sacon,
-                            readOnly: true,
-                            decoration: InputDecoration(
-                              hintText: "Auto-Calculated",
-                              contentPadding: EdgeInsets.symmetric(horizontal: 12, vertical: 10),
-                              border: OutlineInputBorder(
-                                borderRadius: BorderRadius.circular(12),
-                                borderSide: BorderSide.none, // Removes default border
-                              ),
-                              filled: true,
-                              fillColor: Colors.white, // Match button background
-                            ),
-                          ),
-                        ),
+
+                      SizedBox(height: 10),
+                      Text('Remaining Amount', style: TextStyle(fontWeight: FontWeight.bold)),
+                      SizedBox(height: 10),
+                      Container(
+                        width: 300,
+                        alignment: Alignment.centerLeft,
+                        child: _buildInputField(_racon),
                       ),
-                      SizedBox(
-                        height: 10,
-                      ),
-                      Text('Remaining Amount',style: TextStyle(color: Color(0xFF000000),fontWeight: FontWeight.bold),
-                      ),
-                      SizedBox(
-                        height: 10,
-                      ),
-                      SizedBox(
-                        width: 400,
-                        height: 40,
-                        child: Material(
-                          elevation: 5,
-                          borderRadius: BorderRadius.circular(12),
-                          child: TextField(
-                            controller: _racon,
-                            readOnly: true,
-                            // onChanged: remamount(),
-                            decoration: InputDecoration(
-                              contentPadding: EdgeInsets.symmetric(horizontal: 12, vertical: 10),
-                              border: OutlineInputBorder(
-                                borderRadius: BorderRadius.circular(12),
-                                borderSide: BorderSide.none, // Removes default border
-                              ),
-                              filled: true,
-                              fillColor: Colors.white, // Match button background
-                            ),
-                          ),
-                        ),
-                      ),
+
+                      SizedBox(height: 30),
+
                     ],
                   ),
-                )
                 ),
-
-              ],
-                ),
+              ),
+            ],
+          ),
         ),
       ),
-    ),
-
-
-      floatingActionButtonLocation: FloatingActionButtonLocation.endFloat,
-      floatingActionButton: FloatingActionButton(
-
-          child: Icon(Icons.add),
-          tooltip: 'Add Expense',
-          backgroundColor: Color(0xFF010080),
-          // backgroundColor: Color(0xFF000000),
-          foregroundColor: Color(0xFFFFF7FE),
-          onPressed: () async {
-            await Navigator.push(context,
-            MaterialPageRoute(builder: (context)=> addScreenPage(userId: widget.userId),),
-            );
-            _loadTotalSpent();
-          }),
-    );
-  }
-
-  Widget _buildTextField(String label) {
-    return TextFormField(
-      decoration: InputDecoration(
-
-        focusedBorder: OutlineInputBorder(
-          borderSide: const BorderSide(color: Color(0xFF010080), width: 2),
-          borderRadius: BorderRadius.circular(12),
-        ),
-        border: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(12),
-        ),
+      bottomNavigationBar: BottomNavigationBar(
+        currentIndex: _selectedIndex,
+        onTap: _onItemTapped,
+        backgroundColor: Color(0xFF010080), // Your app's blue background
+        selectedItemColor: Colors.white,     // White for selected icon & label
+        unselectedItemColor: Colors.white70,
+        items: const [
+          BottomNavigationBarItem(icon: Icon(Icons.home_filled), label: 'Home'),
+          BottomNavigationBarItem(icon: Icon(Icons.search), label: 'Item Details'),
+          BottomNavigationBarItem(icon: Icon(Icons.person), label: 'Profile'),
+        ],
       ),
+      floatingActionButton: _selectedIndex == 0
+          ? FloatingActionButton(
+        child: Icon(Icons.add),
+        tooltip: 'Add Expense',
+        backgroundColor: Color(0xFF010080),
+        foregroundColor: Color(0xFFFFF7FE),
+        onPressed: () async {
+          await Navigator.push(
+            context,
+            MaterialPageRoute(
+              builder: (context) =>
+                  addScreenPage(userId: widget.userId),
+            ),
+          );
+          _loadTotalSpent();
+        },
+      )
+          : null,
     );
   }
 }
 
-// i want to create a scrren page which contains 7 widget first category of item which is dropdown second item name third amount fourth item quantities fifth date picker which takes year month day date all , sixth a item description box and seventh add button
