@@ -85,8 +85,12 @@ class _itemDashboardState extends State<itemDashboard> {
         leading: IconButton(
           icon: Icon(Icons.arrow_back_ios_new),
           color: Color(0xFFF7F4F2),
-          onPressed: () {
-            Navigator.pop(context);
+          onPressed: () async{
+            print("back button pressed");
+            Navigator.pushReplacement(
+              context,
+              MaterialPageRoute(builder: (_) => dashboardPage(userId: widget.userId)),
+            );
           },
         ),
         title: const Text(
@@ -96,7 +100,8 @@ class _itemDashboardState extends State<itemDashboard> {
         backgroundColor: const Color(0xFF010080),
         elevation: 0,
       ),
-      body: Container(
+      body: SafeArea(
+        child: Container(
         width: double.infinity,
         height: double.infinity,
         decoration: const BoxDecoration(
@@ -212,7 +217,7 @@ class _itemDashboardState extends State<itemDashboard> {
                             ),
                           ],
                         ),
-                        SizedBox(height: 4),
+                        SizedBox(height: 2),
                         Align(
                           alignment: Alignment.centerLeft,
                           child: Container(
@@ -251,7 +256,7 @@ class _itemDashboardState extends State<itemDashboard> {
                           ],
                         ),
                         if (item.description.isNotEmpty) ...[
-                          SizedBox(height: 12),
+                          SizedBox(height: 8),
                           Text(
                             item.description,
                             style: TextStyle(
@@ -270,7 +275,8 @@ class _itemDashboardState extends State<itemDashboard> {
           },
           separatorBuilder: (context, index) => SizedBox(height: 2),
         ),
-      ),
+      ),),
+
 
       bottomNavigationBar: BottomNavigationBar(
         currentIndex: _selectedIndex,
@@ -302,6 +308,7 @@ class _itemDashboardState extends State<itemDashboard> {
     );
   }
 }
+
 
 
 
