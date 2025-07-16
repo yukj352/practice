@@ -1,7 +1,9 @@
-
-
+import 'package:shared_preferences/shared_preferences.dart';
+import 'package:final_cal/login.dart';
 import 'package:flutter/material.dart';
 import 'SignUpPage.dart';
+import 'dashboardPage.dart';
+
 
 class ExpenseTrackerSplashScreen extends StatefulWidget {
   const ExpenseTrackerSplashScreen({super.key});
@@ -22,12 +24,27 @@ class _ExpenseTrackerSplashScreenState extends State<ExpenseTrackerSplashScreen>
         _opacity = 1;
       });
     });
-    Future.delayed(const Duration(seconds: 3), () {
+    _navigateAfterSplash();
+  }
+
+  Future<void> _navigateAfterSplash() async {
+    await Future.delayed(const Duration(seconds: 3));
+
+    final prefs = await SharedPreferences.getInstance();
+    bool isLoggedIn = prefs.getBool('isLoggedIn') ?? false;
+    int? userId = prefs.getInt('userId');
+
+    if (isLoggedIn && userId != null) {
       Navigator.pushReplacement(
         context,
-        MaterialPageRoute(builder: (context) => SignupPage()),
+        MaterialPageRoute(builder: (context) => dashboardPage(userId: userId)),
       );
-    });
+    } else {
+      Navigator.pushReplacement(
+        context,
+        MaterialPageRoute(builder: (context) => loginPage()),
+      );
+    }
   }
 
   @override
@@ -99,94 +116,6 @@ class _ExpenseTrackerSplashScreenState extends State<ExpenseTrackerSplashScreen>
 
 
 
-
-
-
-
-
-// import 'package:flutter/material.dart';
-// import 'SignUpPage.dart';
-// class ExpenseTrackerSplashScreen extends StatefulWidget {
-//   const ExpenseTrackerSplashScreen({super.key});
-//
-//   @override
-//   State<ExpenseTrackerSplashScreen> createState() => _ExpensetrackerSplashScreenState();
-// }
-//
-// class _ExpensetrackerSplashScreenState extends State<ExpenseTrackerSplashScreen> {
-//   @override
-//   double _opacity = 0.0;
-//
-//   void initState() {
-//     super.initState();
-//     Future.delayed(Duration(milliseconds: 500), () {
-//       setState(() {
-//         _opacity = 1;
-//       });
-//     });
-//     Future.delayed(Duration(seconds: 2), () {
-//       Navigator.pushReplacement(
-//         context, MaterialPageRoute(builder: (context) => SignupPage()),);
-//     });
-//   }
-//
-//   @override
-//   Widget build(BuildContext context) {
-//     return Scaffold(
-//       body: Container(
-//         decoration: BoxDecoration(
-//           gradient: LinearGradient(
-//             colors: [Color(0xFF7F3387), Color(0xFFFFFFFF)],
-//             begin: Alignment.topCenter,
-//             end: Alignment.bottomCenter,
-//           ),
-//         ),
-//         child: Center(
-//           child: Column(
-//             mainAxisAlignment: MainAxisAlignment.center,
-//             children: [
-//               CircleAvatar(
-//                 radius: 70,
-//                 backgroundColor: Colors.transparent, // Optional: avoids a white ring
-//                 backgroundImage: AssetImage('mainlogo.png'),
-//               ),
-//               Padding(
-//                 padding: const EdgeInsets.symmetric(vertical: 30),
-//                 child: Column(
-//                   children: [
-//                     Text(
-//                       "FinFlow",
-//                       style: TextStyle(
-//                         fontSize: 30,
-//                         fontWeight: FontWeight.w700,
-//                         color: Color(0xFFB44FD1),
-//                       ),
-//                     ),
-//                     Text(
-//                       "Manage Your Money, Effortlessly",
-//                       style: TextStyle(
-//                         fontSize: 16,
-//                         fontWeight: FontWeight.w400,
-//                         color: Colors.white,
-//                       ),
-//                     ),
-//                   ],
-//                 ),
-//               ),
-//               Padding(
-//                 padding: const EdgeInsets.symmetric(vertical: 40),
-//                 child: CircularProgressIndicator(
-//                   valueColor: AlwaysStoppedAnimation(Color(0xFFB44FD1)),
-//                   strokeWidth: 5,
-//                 ),
-//               ),
-//             ],
-//           ),
-//         ),
-//       ),
-//     );
-//   }
-// }
 
 
 
