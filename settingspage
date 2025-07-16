@@ -1,0 +1,326 @@
+import 'package:final_cal/login.dart';
+import 'package:flutter/material.dart';
+import 'dashboardPage.dart';
+import 'package:shared_preferences/shared_preferences.dart';
+
+import 'db_helper.dart';
+import 'profilePage.dart';  // Import your profile page
+import 'itemDashboard.dart';  // Import your item dashboard
+
+class SettingsPage extends StatefulWidget {
+  final int userId;
+  const SettingsPage({super.key, required this.userId});
+
+  @override
+  State<SettingsPage> createState() => _SettingsPageState();
+}
+
+class _SettingsPageState extends State<SettingsPage> {
+
+  Future<void> _showResetConfirmation() async {
+    final bool? confirmed = await showDialog<bool>(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: const Text('Confirm Reset'),
+        content: const Text('Are you sure you want to reset all data?'),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.of(context).pop(false),
+            child: const Text('Cancel'),
+          ),
+          ElevatedButton(
+            onPressed: () => Navigator.of(context).pop(true),
+            child: const Text('Reset'),
+          ),
+        ],
+      ),
+    );
+
+    if (confirmed == true) {
+      // Reset logic
+      final prefs = await SharedPreferences.getInstance();
+
+      await prefs.remove('items');
+      await prefs.setDouble('remainingAmount', 0.0);
+      await prefs.setDouble('spentAmount', 0.0);
+
+      final dbHelper = DatabaseHelper();
+      await dbHelper.resetUserData(widget.userId);
+
+      if (!mounted) return;
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Data reset successfully')),
+      );
+    }
+  }
+
+  // Navigation to Profile
+  void _navigateToProfile() {
+    Navigator.push(
+      context,
+      MaterialPageRoute(builder: (_) => profilePage(userId: widget.userId)),
+    );
+  }
+
+  // Navigation to All Items
+  void _navigateToItems() {
+    Navigator.push(
+      context,
+      MaterialPageRoute(builder: (_) => itemDashboard(userId: widget.userId)),
+    );
+  }
+
+  // Navigation to Dashboard
+  void _navigateToDashboard() {
+    Navigator.push(
+      context,
+      MaterialPageRoute(builder: (_) => dashboardPage(userId: widget.userId)),
+    );
+  }
+
+  // Logout logic
+  void _logout() async {
+    final prefs = await SharedPreferences.getInstance();
+    await prefs.remove('isLoggedIn');
+    await prefs.remove('userId');
+    await prefs.remove('username');
+    Navigator.pushAndRemoveUntil(
+      context,
+      MaterialPageRoute(builder: (_) => loginPage()), // Navigate to login screen
+          (_) => false,
+    );
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(
+        title: const Text(
+          'Settings',
+          style: TextStyle(
+            color: Color(0xFFF5F5F5),
+            fontWeight: FontWeight.w900,
+          ),
+        ),
+        iconTheme: const IconThemeData(
+          color: Colors.white,
+        ),
+        backgroundColor: const Color(0xFF010080),
+      ),
+      body: Container(
+        decoration: const BoxDecoration(
+          gradient: LinearGradient(
+            colors: [
+              Color(0xFFD3E3FD),
+              Color(0xFFFFFFFF),
+              Color(0xFF505AD8),
+            ],
+            begin: Alignment.topCenter,
+            end: Alignment.bottomCenter,
+          ),
+        ),
+        child: Padding(
+          padding: const EdgeInsets.all(24.0),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.stretch,
+            children: [
+              // Reset Data Button
+              Material(
+                elevation: 5,
+                borderRadius: BorderRadius.circular(12),
+                color: Colors.white,
+                child: InkWell(
+                  borderRadius: BorderRadius.circular(12),
+                  onTap: _showResetConfirmation,
+                  child: const ListTile(
+                    leading: Icon(Icons.restore),
+                    title: Text('Reset Data'),
+                  ),
+                ),
+              ),
+              SizedBox(height: 20),
+
+              // Navigate to Profile Button
+              Material(
+                elevation: 5,
+                borderRadius: BorderRadius.circular(12),
+                color: Colors.white,
+                child: InkWell(
+                  borderRadius: BorderRadius.circular(12),
+                  onTap: _navigateToProfile,
+                  child: const ListTile(
+                    leading: Icon(Icons.person),
+                    title: Text('Profile'),
+                  ),
+                ),
+              ),
+              SizedBox(height: 20),
+
+              // Navigate to All Items Button
+              Material(
+                elevation: 5,
+                borderRadius: BorderRadius.circular(12),
+                color: Colors.white,
+                child: InkWell(
+                  borderRadius: BorderRadius.circular(12),
+                  onTap: _navigateToItems,
+                  child: const ListTile(
+                    leading: Icon(Icons.list),
+                    title: Text('All Items'),
+                  ),
+                ),
+              ),
+              SizedBox(height: 20),
+
+              // Navigate to Dashboard Button
+              Material(
+                elevation: 5,
+                borderRadius: BorderRadius.circular(12),
+                color: Colors.white,
+                child: InkWell(
+                  borderRadius: BorderRadius.circular(12),
+                  onTap: _navigateToDashboard,
+                  child: const ListTile(
+                    leading: Icon(Icons.dashboard),
+                    title: Text('Dashboard'),
+                  ),
+                ),
+              ),
+              SizedBox(height: 20),
+
+              // Logout Button
+              Material(
+                elevation: 5,
+                borderRadius: BorderRadius.circular(12),
+                color: Colors.white,
+                child: InkWell(
+                  borderRadius: BorderRadius.circular(12),
+                  onTap: _logout,
+                  child: const ListTile(
+                    leading: Icon(Icons.exit_to_app),
+                    title: Text('Logout'),
+                  ),
+                ),
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+}
+
+
+
+
+
+
+
+
+
+
+// import 'package:flutter/material.dart';
+// import 'dashboardPage.dart';
+// import 'package:shared_preferences/shared_preferences.dart';
+//
+// import 'db_helper.dart';
+//
+// class SettingsPage extends StatefulWidget {
+//   final int userId;
+//   const SettingsPage({super.key,required this.userId});
+//
+//   @override
+//   State<SettingsPage> createState() => _SettingsPageState();
+// }
+//
+// class _SettingsPageState extends State<SettingsPage> {
+//   Future<void> _showResetConfirmation() async {
+//     final bool? confirmed = await showDialog<bool>(
+//       context: context,
+//       builder: (context) => AlertDialog(
+//         title: const Text('Confirm Reset'),
+//         content: const Text('Are you sure you want to reset all data?'),
+//         actions: [
+//           TextButton(
+//             onPressed: () => Navigator.of(context).pop(false),
+//             child: const Text('Cancel'),
+//           ),
+//           ElevatedButton(
+//             onPressed: () => Navigator.of(context).pop(true),
+//             child: const Text('Reset'),
+//           ),
+//         ],
+//       ),
+//     );
+//
+//     if (confirmed == true) {
+//       // TODO: Add your reset logic here
+//       final prefs = await SharedPreferences.getInstance();
+//
+//       await prefs.remove('items');
+//       await prefs.setDouble('remainingAmount',0.0);
+//       await prefs.setDouble('spentAmount',0.0);
+//
+//       final dbHelper = DatabaseHelper();
+//       await dbHelper.resetUserData(widget.userId);
+//
+//       if(!mounted) return;
+//       ScaffoldMessenger.of(context).showSnackBar(
+//         const SnackBar(content: Text('Data reset successfully')),
+//       );
+//     }
+//   }
+//
+//   @override
+//   Widget build(BuildContext context) {
+//     return Scaffold(
+//       appBar: AppBar(
+//         title: const Text(
+//           'Settings',
+//           style: TextStyle(
+//             color: Color(0xFFF5F5F5),
+//             fontWeight: FontWeight.w900,
+//           ),
+//         ),
+//         iconTheme: const IconThemeData(
+//           color: Colors.white,
+//         ),
+//         backgroundColor: const Color(0xFF010080),
+//       ),
+//       body: Container(
+//         decoration: const BoxDecoration(
+//           gradient: LinearGradient(
+//             colors: [
+//               Color(0xFFD3E3FD),
+//               Color(0xFFFFFFFF),
+//               Color(0xFF505AD8),
+//             ],
+//             begin: Alignment.topCenter,
+//             end: Alignment.bottomCenter,
+//           ),
+//         ),
+//         child: Padding(
+//           padding: const EdgeInsets.all(24.0),
+//           child: Column(
+//             crossAxisAlignment: CrossAxisAlignment.stretch,
+//             children: [
+//               Material(
+//                 elevation: 5,
+//                 borderRadius: BorderRadius.circular(12),
+//                 color: Colors.white,
+//                 child: InkWell(
+//                   borderRadius: BorderRadius.circular(12),
+//                   onTap: _showResetConfirmation,
+//                   child: const ListTile(
+//                     leading: Icon(Icons.restore),
+//                     title: Text('Reset Data'),
+//                   ),
+//                 ),
+//               ),
+//             ],
+//           ),
+//         ),
+//       ),
+//     );
+//   }
+// }
