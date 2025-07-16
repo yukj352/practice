@@ -1,8 +1,8 @@
-
 import 'package:final_cal/SignUpPage.dart';
 import 'package:flutter/material.dart';
 import 'package:final_cal/dashboardPage.dart';
 import 'package:final_cal/db_helper.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 class loginPage extends StatefulWidget {
   const loginPage({super.key});
@@ -16,14 +16,13 @@ class _loginPageState extends State<loginPage> {
   final _emailController = TextEditingController();
   final _passwordController = TextEditingController();
 
+  // Boolean variable to toggle password visibility
+  bool _obscurePassword = true;
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        leading: IconButton(
-          icon: Icon(Icons.arrow_back_ios_new, color: Color(0xFFF7F4F2)),
-          onPressed: () => Navigator.pop(context),
-        ),
         title: const Text("Login", style: TextStyle(color: Colors.white)),
         backgroundColor: const Color(0xFF010080),
         elevation: 0,
@@ -69,7 +68,7 @@ class _loginPageState extends State<loginPage> {
                     "Password",
                     "Enter your password",
                     Icons.lock,
-                    obscureText: true,
+                    obscureText: _obscurePassword, // Use the variable here
                     controller: _passwordController,
                     validator: (value) {
                       if (value == null || value.isEmpty) {
@@ -80,6 +79,17 @@ class _loginPageState extends State<loginPage> {
                       }
                       return null;
                     },
+                    suffixIcon: IconButton(
+                      icon: Icon(
+                        _obscurePassword ? Icons.visibility_off : Icons.visibility,
+                        color: Colors.grey,
+                      ),
+                      onPressed: () {
+                        setState(() {
+                          _obscurePassword = !_obscurePassword; // Toggle visibility
+                        });
+                      },
+                    ),
                   ),
                   const SizedBox(height: 32),
                   SizedBox(
@@ -93,10 +103,19 @@ class _loginPageState extends State<loginPage> {
                           final user = await DatabaseHelper().authenticate(email, password);
 
                           if (user != null) {
-                            Navigator.push(
+                            // Save login state and user info
+                            final prefs = await SharedPreferences.getInstance();
+                            await prefs.setBool('isLoggedIn', true);
+                            await prefs.setInt('userId', user['id']);
+                            await prefs.setString('username', user['name']);
+                            await prefs.setString('userEmail', user['email']); // Added line
+
+                            // Navigate to dashboardPage
+                            Navigator.pushReplacement(
                               context,
                               MaterialPageRoute(
-                                  builder: (context) => dashboardPage(userId: user['id'])),
+                                builder: (context) => dashboardPage(userId: user['id']),
+                              ),
                             );
                           } else {
                             ScaffoldMessenger.of(context).showSnackBar(
@@ -147,6 +166,7 @@ class _loginPageState extends State<loginPage> {
         bool obscureText = false,
         required String? Function(String?) validator,
         required TextEditingController controller,
+        Widget? suffixIcon,
       }) {
     return TextFormField(
       controller: controller,
@@ -162,6 +182,7 @@ class _loginPageState extends State<loginPage> {
           letterSpacing: 0.5,
         ),
         prefixIcon: Icon(icon, color: Color(0xFF000000)),
+        suffixIcon: suffixIcon, // Add the suffix icon (visibility toggle)
         focusedBorder: OutlineInputBorder(
           borderSide: const BorderSide(color: Color(0xFF010080), width: 2),
           borderRadius: BorderRadius.circular(12),
@@ -173,3 +194,4 @@ class _loginPageState extends State<loginPage> {
     );
   }
 }
+
