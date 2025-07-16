@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:final_cal/addScreenPage.dart';
 import 'package:final_cal/db_helper.dart';
@@ -7,6 +8,7 @@ import 'login.dart';
 import 'profilePage.dart';  // <-- Make sure you have this file and correct path
 import 'dart:io';
 import 'package:image_picker/image_picker.dart';
+import 'settings.dart';
 
 
 class dashboardPage extends StatefulWidget {
@@ -22,20 +24,38 @@ class _dashboardPageState extends State<dashboardPage> {
   final ImagePicker _picker = ImagePicker();
   int _selectedIndex = 0; // Home tab index
 
+  late int currentUserId;
+  String _userName ='';
+  String _userEmail='';
+
   TextEditingController _tacon = TextEditingController();
   TextEditingController _sacon = TextEditingController();
   TextEditingController _racon = TextEditingController();
+  TextEditingController _goalcon = TextEditingController();
+  bool _incomeSet=false;//to control initial popup
 
   String? _username;
 
   @override
   void initState() {
     super.initState();
+    currentUserId = widget.userId;
     WidgetsBinding.instance.addPostFrameCallback((_) {
-      _loadTotalSpent();
+
       _loadUserName();
+      _loadUserData();
+      Future.delayed(Duration(seconds: 2),(){
+        _checkSavedIncome();
+      });
     });
   }
+
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    _loadUserData();
+  }
+
 
   Future<void> _loadUserName() async {
     final prefs = await SharedPreferences.getInstance();
@@ -43,6 +63,97 @@ class _dashboardPageState extends State<dashboardPage> {
       _username = prefs.getString('username') ?? 'User';
     });
   }
+
+
+  Future<void> _loadUserData() async {
+    final userData = await DatabaseHelper().getUserById(currentUserId);
+    if(userData != null){
+      setState(() {
+        _userName = userData?['name'] ?? '';
+        _userEmail = userData?['email'] ?? '';
+      });
+    }
+
+  }
+
+  Future<void> _checkSavedIncome() async {
+    final prefs = await SharedPreferences.getInstance();
+    double? savedIncome = prefs.getDouble('total_income_$currentUserId');
+
+    if (savedIncome != null && savedIncome > 0) {
+      setState(() {
+        _tacon.text = savedIncome.toStringAsFixed(2);
+        _goalcon.text = (0.15 * savedIncome).toStringAsFixed(2);
+      });
+
+      _loadTotalSpent(); // ✅ Use saved income to calculate
+    } else {
+      _showIncomeInputDialog(); // ❌ Not set yet — ask user
+    }
+  }
+
+  Future<void> _showIncomeInputDialog() async {
+    final TextEditingController tempIncomeController = TextEditingController();
+    final TextEditingController tempGoalController = TextEditingController();
+
+    await showDialog(
+      context: context,
+      barrierDismissible: false,
+      builder: (context) {
+        return AlertDialog(
+          title: Text('Enter Total Income'),
+          content: SizedBox(
+            width:200,
+            height:145,
+            child: Column(
+              children: [
+                TextField(
+                  controller: tempIncomeController,
+                  keyboardType: TextInputType.numberWithOptions(decimal: true),
+                  decoration: InputDecoration(hintText: 'Total Income'),
+                ),
+                SizedBox(height: 10),
+                TextField(
+                  controller: tempGoalController,
+                  keyboardType: TextInputType.numberWithOptions(decimal: true),
+                  decoration: InputDecoration(hintText: 'Saving Amount (Optional)'),
+                ),
+              ],
+            ),
+          ),
+          actions: [
+            TextButton(
+              onPressed: () async{
+                double total = double.tryParse(tempIncomeController.text) ?? 0.0;
+                double savingGoal = double.tryParse(tempGoalController.text) ?? 0.0;
+
+                if (total <= 0) {
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    SnackBar(content: Text("Please enter a valid income")),
+                  );
+                  return;
+                }
+                final prefs = await SharedPreferences.getInstance();
+                await prefs.setDouble('total_income_$currentUserId',total);
+                await prefs.setDouble('goal_amount_$currentUserId',savingGoal);
+
+                setState(() {
+                  _tacon.text = total.toStringAsFixed(2);
+                  _goalcon.text = (0.15 * total).toStringAsFixed(2);
+                  _incomeSet = true;
+                });
+
+                Navigator.pop(context);
+                _loadTotalSpent(); // Also calculates remaining
+              },
+              child: Text('Submit'),
+            ),
+          ],
+        );
+      },
+    );
+  }
+
 
   Future<void> _pickImage() async {
     final pickedFile = await _picker.pickImage(source: ImageSource.gallery, imageQuality: 70);
@@ -58,22 +169,24 @@ class _dashboardPageState extends State<dashboardPage> {
   void remamount() {
     double total = double.tryParse(_tacon.text) ?? 0.0;
     double spent = double.tryParse(_sacon.text) ?? 0.0;
+    double goal = double.tryParse(_goalcon.text) ?? 0.0;
 
     if (total == 0.0) return;
     double rem = total - spent;
 
     if (spent > total) {
+      // Alert for spending more than total income
       showDialog(
         context: context,
         builder: (context) => AlertDialog(
           title: Text('Alert'),
-          content: Text('OOPS! Spent is more than Total Income'),
+          content: Text('Spent is more than your total income!'),
           actions: [
             TextButton(
               onPressed: () {
                 setState(() {
-                  _sacon.text = '0.0';
-                  _racon.text = '0.0';
+                  _sacon.text = '0.0'; // Reset the spent value
+                  _racon.text = '0.0'; // Reset the remaining value
                 });
                 Navigator.pop(context);
               },
@@ -82,7 +195,26 @@ class _dashboardPageState extends State<dashboardPage> {
           ],
         ),
       );
-    } else {
+    }
+    else if (spent > goal) {
+      // Alert if spent exceeds saving goal
+      showDialog(
+        context: context,
+        builder: (context) => AlertDialog(
+          title: Text('Alert'),
+          content: Text('Spent exceeds your saving goal!'),
+          actions: [
+            TextButton(
+              onPressed: () {
+                Navigator.pop(context);
+              },
+              child: Text('OK'),
+            ),
+          ],
+        ),
+      );
+    }
+    else {
       setState(() {
         _racon.text = rem.toStringAsFixed(2);
       });
@@ -104,31 +236,36 @@ class _dashboardPageState extends State<dashboardPage> {
     }
   }
 
-  void _onItemTapped(int index) {
-    if (index == _selectedIndex) return; // no action if current tab tapped
-
-    if (index == 0) {
-      // Home tab: pushReplacement to dashboardPage
-      Navigator.pushReplacement(
-        context,
-        MaterialPageRoute(builder: (_) => dashboardPage(userId: widget.userId)),
-      );
-    } else if (index == 1) {
-      // Search tab: pushReplacement to itemDashboard
-      Navigator.pushReplacement(
-        context,
-        MaterialPageRoute(builder: (_) => itemDashboard(userId: widget.userId)),
-      );
-    } else if (index == 2) {
-      // Profile tab: pushReplacement to profilePage
-      Navigator.pushReplacement(
-        context,
-        MaterialPageRoute(builder: (_) => profilePage(userId: widget.userId)),
-      );
+  void _exitApp() {
+    if (Platform.isAndroid) {
+      SystemNavigator.pop();
+    } else if (Platform.isIOS) {
+      exit(0);  // Force exit for iOS (not recommended for production)
     }
   }
 
-  Widget _buildInputField(TextEditingController controller, {bool enabled = false}) {
+  void _onItemTapped(int index) async {
+    if (index == _selectedIndex) return;
+
+    if (index == 0) {
+      // home - maybe do nothing or refresh
+    } else if (index == 1) {
+      Navigator.pushReplacement(context, MaterialPageRoute(builder: (_) => itemDashboard(userId: currentUserId)));
+    } else if (index == 2) {
+      final updated = await Navigator.push<bool>(
+        context,
+        MaterialPageRoute(builder: (_) => profilePage(userId: currentUserId)),
+      );
+
+      if (updated == true) {
+        _loadUserData(); // reload user data after returning from profile update
+      }
+    }
+  }
+
+
+
+  Widget _buildInputField(TextEditingController controller, {bool enabled = false,String label=''}) {
     return SizedBox(
       height: 40,
       width: double.infinity,
@@ -147,6 +284,17 @@ class _dashboardPageState extends State<dashboardPage> {
               borderRadius: BorderRadius.circular(12),
               borderSide: BorderSide.none,
             ),
+            suffixIcon: enabled
+                ? IconButton(
+              icon: Icon(Icons.edit),
+              onPressed: () {
+                // Toggle enabled state to allow editing
+                setState(() {
+                  enabled = true;
+                });
+              },
+            )
+                : null,
           ),
         ),
       ),
@@ -174,35 +322,50 @@ class _dashboardPageState extends State<dashboardPage> {
         backgroundColor: const Color(0xFF010080),
         elevation: 0,
         actions: [
-          PopupMenuButton<String>(
-            onSelected: (value) async {
-              if (value == 'Item Dashboard') {
-                await Navigator.push(
-                  context,
-                  MaterialPageRoute(
-                    builder: (context) => itemDashboard(userId: widget.userId),
-                  ),
-                );
-                _loadTotalSpent();
-              }
-            },
-            itemBuilder: (BuildContext context) {
-              return [
-                PopupMenuItem<String>(
-                  value: 'Item Dashboard',
-                  child: Text(
-                    'Item Details',
-                    style: TextStyle(
-                      color: Color(0xFF040104),
-                      fontWeight: FontWeight.bold,
-                      fontSize: 16,
-                    ),
-                  ),
-                ),
-              ];
-            },
-          )
-        ],
+      PopupMenuButton<String>(
+      onSelected: (value) async {
+    if (value == 'Item Dashboard') {
+    await Navigator.push(
+    context,
+    MaterialPageRoute(
+    builder: (context) => itemDashboard(userId: widget.userId),
+    ),
+    );
+    _loadTotalSpent();
+    } else if (value == 'Exit') {
+    // Exit action
+    _exitApp();
+    }
+    },
+      itemBuilder: (BuildContext context) {
+        return [
+          PopupMenuItem<String>(
+            value: 'Item Dashboard',
+            child: Text(
+              'Item Details',
+              style: TextStyle(
+                color: Color(0xFF040104),
+                fontWeight: FontWeight.bold,
+                fontSize: 16,
+              ),
+            ),
+          ),
+          PopupMenuItem<String>(
+            value: 'Exit',
+            child: Text(
+              'Exit',
+              style: TextStyle(
+                color: Color(0xFF040104),
+                fontWeight: FontWeight.bold,
+                fontSize: 16,
+              ),
+            ),
+          ),
+        ];
+      },
+    )
+
+    ],
       ),
 
 
@@ -261,7 +424,7 @@ class _dashboardPageState extends State<dashboardPage> {
                 if (_selectedIndex != 2) {
                   Navigator.pushReplacement(
                     context,
-                    MaterialPageRoute(builder: (_) => profilePage(userId: widget.userId)),
+                    MaterialPageRoute(builder: (_) => profilePage(userId: currentUserId)),
                   );
                 }
               },
@@ -271,31 +434,23 @@ class _dashboardPageState extends State<dashboardPage> {
               leading: Icon(Icons.settings),
               title: Text('Settings'),
               onTap: () {
-                Navigator.pop(context);
-                // TODO: Add settings page navigation if needed
-                ScaffoldMessenger.of(context).showSnackBar(
-                  SnackBar(content: Text('Settings tapped')),
+                Navigator.pop(context); // Close the drawer first
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(builder: (context) => SettingsPage(userId: currentUserId)),
                 );
               },
             ),
-            // ListTile(
-            //   leading: Icon(Icons.refresh),
-            //   title: Text('Reset'),
-            //   onTap: () {
-            //     Navigator.pop(context);
-            //     _resetValues();
-            //     ScaffoldMessenger.of(context).showSnackBar(
-            //       SnackBar(content: Text('Values reset')),
-            //     );
-            //   },
-            // ),
+
             ListTile(
               leading: Icon(Icons.logout),
               title: Text('Logout'),
               onTap: () async {
                 Navigator.pop(context);
                 final prefs = await SharedPreferences.getInstance();
-                await prefs.clear();
+                await prefs.remove('isLoggedIn');
+                await prefs.remove('userId');
+                await prefs.remove('username');
                 Navigator.pushAndRemoveUntil(
                   context,
                   MaterialPageRoute(builder: (_) => loginPage()),
@@ -325,7 +480,7 @@ class _dashboardPageState extends State<dashboardPage> {
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               Material(
-                color: Color(0xFF040104),
+                color: Color(0xFFC6D8FF),
                 borderRadius: BorderRadius.circular(12),
                 child: Padding(
                   padding: const EdgeInsets.all(8.0),
@@ -339,7 +494,7 @@ class _dashboardPageState extends State<dashboardPage> {
                       "Welcome ${_username ?? ''}",
                       style: TextStyle(
                           fontSize: 20,
-                          color: Colors.white,
+                          color: Colors.black87,
                           fontWeight: FontWeight.bold),
                     ),
                     shape: RoundedRectangleBorder(
@@ -362,7 +517,14 @@ class _dashboardPageState extends State<dashboardPage> {
                         alignment: Alignment.centerLeft,
                         child: _buildInputField(_tacon, enabled: true),
                       ),
-
+                      SizedBox(height: 10),
+                      Text('Saving Amount', style: TextStyle(fontWeight: FontWeight.bold)),
+                      SizedBox(height: 10),
+                      Container(
+                        width: 300,
+                        alignment: Alignment.centerLeft,
+                        child: _buildInputField(_goalcon, enabled: true),
+                      ),
                       SizedBox(height: 10),
                       Text('Spent Amount', style: TextStyle(fontWeight: FontWeight.bold)),
                       SizedBox(height: 10),
@@ -424,4 +586,5 @@ class _dashboardPageState extends State<dashboardPage> {
     );
   }
 }
+
 
