@@ -1,0 +1,21 @@
+# list printing using range function
+list1=[1,2,3]
+for i in range(len(list1)):
+    print(list1[i])
+# list printing without range function
+list1=[1,2,3]
+for i in list1:
+    print(i)
+# prefix sum array
+list1=[1,2,3,4,5,6]
+final=[]
+sum=0
+for i in list1:
+    sum+=i
+    final.append(sum)
+for i in final:
+    print(i)
+# reverse a string
+name = input()
+for i in range(len(name)-1,-1,-1):
+    print(name[i],end='')
